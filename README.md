@@ -1,6 +1,6 @@
 # platform
 
->  platform
+>  基于VUE+SVG的流程
 
 ## Build Setup
 
