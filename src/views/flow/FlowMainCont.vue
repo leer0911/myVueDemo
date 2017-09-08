@@ -406,8 +406,7 @@ export default {
       }
       return { top, left }
     },
-    computePolyLine (start, end) {
-      let { startDirection } = this.drawLineInfo
+    computePolyLine (start, end, direction) {
       let startPoint = {
         x: +(start.split(',')[0]),
         y: +(start.split(',')[1])
@@ -417,8 +416,7 @@ export default {
         y: +(end.split(',')[1])
       }
       let m1, m2
-      console.log(this.drawLineInfo)
-      switch (startDirection) {
+      switch (direction) {
         case 't':
         case 'b':
           let mY = startPoint.y + (endPoint.y - startPoint.y) / 2
@@ -495,8 +493,9 @@ export default {
         switch (this.selLineType) {
           case 'LinePoly':
             let startP = this.drawLineInfo.lineStyle.points.split(' ')[0]
+            let direction = this.drawLineInfo.startDirection
             let endP = `${left},${top}`
-            this.drawLineInfo.lineStyle.points = this.computePolyLine(startP, endP)
+            this.drawLineInfo.lineStyle.points = this.computePolyLine(startP, endP, direction)
             break
           case 'StraightLine':
             this.drawLineInfo.lineStyle.x2 = left
@@ -599,7 +598,7 @@ export default {
               let arr = this.lineData[key].lineStyle.points.split(' ')
               let startP = `${left},${top}`
               let endP = arr[arr.length - 1]
-              let points = this.computePolyLine(startP, endP)
+              let points = this.computePolyLine(startP, endP, direction)
               data[key] = {
                 ...this.lineData[key],
                 lineStyle: {
@@ -631,7 +630,7 @@ export default {
               let arr = this.lineData[key].lineStyle.points.split(' ')
               let startP = arr[0]
               let endP = `${left},${top}`
-              let points = this.computePolyLine(startP, endP)
+              let points = this.computePolyLine(startP, endP, direction)
               data[key] = {
                 ...this.lineData[key],
                 lineStyle: {
