@@ -407,6 +407,7 @@ export default {
       return { top, left }
     },
     computePolyLine (start, end) {
+      let { startDirection } = this.drawLineInfo
       let startPoint = {
         x: +(start.split(',')[0]),
         y: +(start.split(',')[1])
@@ -415,15 +416,37 @@ export default {
         x: +(end.split(',')[0]),
         y: +(end.split(',')[1])
       }
-      let mY = startPoint.y + (endPoint.y - startPoint.y) / 2
-      let m1 = {
-        x: startPoint.x,
-        y: mY
+      let m1, m2
+      console.log(this.drawLineInfo)
+      switch (startDirection) {
+        case 't':
+        case 'b':
+          let mY = startPoint.y + (endPoint.y - startPoint.y) / 2
+          m1 = {
+            x: startPoint.x,
+            y: mY
+          }
+          m2 = {
+            x: endPoint.x,
+            y: mY
+          }
+          break
+        case 'l':
+        case 'r':
+          let mX = startPoint.x + (endPoint.x - startPoint.x) / 2
+          m1 = {
+            x: mX,
+            y: startPoint.y
+          }
+          m2 = {
+            x: mX,
+            y: endPoint.y
+          }
+          break
+        default:
+          break
       }
-      let m2 = {
-        x: endPoint.x,
-        y: mY
-      }
+
       return `${startPoint.x},${startPoint.y} ${m1.x},${m1.y} ${m2.x},${m2.y} ${endPoint.x},${endPoint.y}`
     },
     drawLineStart (ev) {

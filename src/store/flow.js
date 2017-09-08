@@ -22,7 +22,7 @@ const store = {
       zoomRate: 1 // 全局缩放比例
     },
     selLineType: 'StraightLine',
-    historyLength: 1,
+    historyLength: 0,
     historyIndex: 0
   },
   mutations: {

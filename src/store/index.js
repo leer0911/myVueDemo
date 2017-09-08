@@ -7,6 +7,8 @@ import { cloneDeep } from 'lodash/fp'
 
 const undoRedoPlugin = (store) => {
   let firstState = cloneDeep(store.state);
+  let length = undoRedoHistory.history.length
+  let index = undoRedoHistory.currentIndex
 
   undoRedoHistory.init(store);
   undoRedoHistory.addState(firstState);
@@ -14,20 +16,32 @@ const undoRedoPlugin = (store) => {
   store.subscribe((mutation, state) => {
 
     let filterMuation = [
-      'flow/SEL_NODETYPE',
-      // 'flow/UPDATE_NODE'
-      'flow/UPDATE_HISTORY',
-      'flow/UPDATE_HISTORYINDEX',
-      'flow/UNDO',
-      'flow/REDO'
+      // 'flow/SEL_NODETYPE',
+      // 'flow/UPDATE_HISTORY',
+      // 'flow/UPDATE_HISTORYINDEX',
+      // 'flow/UNDO',
+      // 'flow/REDO',
+      // 'flow/UPDATE_DRAWSTYLE',
+      'flow/UPDATE_NODE',
+      'flow/UPDATE_LINE',
     ]
     let type = mutation.type
     let condition = filterMuation.indexOf(type)
     let length = undoRedoHistory.history.length
     let index = undoRedoHistory.currentIndex
     // 只有新增
-    if (condition <= -1) {
+    if (condition > -1) {
       undoRedoHistory.addState(cloneDeep(state));
+      if (index >= 0) {
+        store.commit('flow/UPDATE_HISTORY', true)
+      } else {
+        store.commit('flow/UPDATE_HISTORY', false)
+      }
+      if (index !== length - 1) {
+        store.commit('flow/UPDATE_HISTORYINDEX', true)
+      } else {
+        store.commit('flow/UPDATE_HISTORYINDEX', false)
+      }
     }
     switch (type) {
       case 'flow/UNDO':
@@ -43,18 +57,6 @@ const undoRedoPlugin = (store) => {
       default:
         break;
     }
-    if (index > 0) {
-      store.commit('flow/UPDATE_HISTORY', true)
-    } else {
-      store.commit('flow/UPDATE_HISTORY', false)
-    }
-
-    if (index !== length - 1) {
-      store.commit('flow/UPDATE_HISTORYINDEX', true)
-    } else {
-      store.commit('flow/UPDATE_HISTORYINDEX', false)
-    }
-
   });
 }
 
@@ -79,12 +81,28 @@ class UndoRedoHistory {
     const prevState = this.history[this.currentIndex - 1];
     this.store.replaceState(cloneDeep(prevState));
     this.currentIndex--;
+    this.changeState()
+  }
+
+  changeState(){
+    if (this.currentIndex > 0) {
+      this.store.commit('flow/UPDATE_HISTORY', true)
+    } else {
+      this.store.commit('flow/UPDATE_HISTORY', false)
+    }
+
+    if (this.currentIndex !== this.history.length - 1) {
+      this.store.commit('flow/UPDATE_HISTORYINDEX', true)
+    } else {
+      this.store.commit('flow/UPDATE_HISTORYINDEX', false)
+    }
   }
 
   redo() {
     const nextState = this.history[this.currentIndex + 1];
     this.store.replaceState(cloneDeep(nextState));
     this.currentIndex++;
+    this.changeState()
   }
 }
 
