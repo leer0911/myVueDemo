@@ -16,30 +16,44 @@
               <img src="~assets/arrow.png" alt="" :style="arrowStyle.r" class="arrow arrow-right" draggable="false" data-direction="r">
             </div>
           </foreignObject>
-          <g id="draw-line">
+          <g id="draw-line" style="cursor:row-resize;">
+
             <component :is="selLineType" :lineStyle="drawLineInfo.lineStyle" v-if="lineDrawing">
             </component>
-            <component v-for="(item,index) in lineData" :is="item.type" :key="index" :lineStyle="item.lineStyle" :id="item.id" @mouseover="a">
+            <component v-for="(item,index) in lineData" :is="item.type" :key="index" :lineStyle="item.lineStyle" :id="item.id" v-line>
             </component>
+            <component :is="clickInfo.type" :lineStyle="clickInfo.lineStyle" v-show="showLineSet">
+            </component>
+
           </g>
           <g id="draw-node">
-            <component v-for="(item,index) in nodeData" :is="item.type" :key="index" :transform="item.transform" :shapeStyle="shapeStyle" :id="item.id" v-drag>
+            <component :is="selNodeInfo.type" :transform="selNodeInfo.transform" :shapeStyle="shapeStyle" v-if="isDragging">
             </component>
+            <component v-for="(item,index) in nodeData" :is="item.type" :key="index" :transform="item.transform" :shapeStyle="shapeStyle" :id="item.id" v-node>
+            </component>
+
+            <!-- 修改节点大小 -->
+            <g v-if="showResize">
+              <g :style="{cursor: `${key}-resize`}" :transform="`translate(${item.x},${item.y})`" v-for="(item,key,index) of resizeStyle" :key="index" v-if="key!=='rect'">
+                <image x="-8" y="-8" width="17" height="17" xlink:href="~assets/point.png"></image>
+              </g>
+              <g :transform="`translate(${resizeStyle.rect.x},${resizeStyle.rect.y})`" style="cursor: move; visibility: visible;">
+                <rect :width="resizeStyle.rect.w" :height="resizeStyle.rect.h" fill="none" stroke="#00a8ff" stroke-dasharray="3 3" pointer-events="none"></rect>
+              </g>
+            </g>
+
           </g>
         </svg>
+        <tool-menu :ulStyle="'width:100px;text-align:center'" :visible.sync="visible" :menuData="menuData" @selItme="deleteHandle" :style="{top:menuInfo.top,left:menuInfo.left}"></tool-menu>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-// import SVG from 'svg.js'
-// import 'svg.select.js'
-// import 'svg.resize.js'
-// import 'svg.draggable.js'
-// import 'svg.panzoom.js'
 import shapesMixin from './shapes/shapesMixin.js'
 import { mapState, mapMutations } from 'vuex'
+import ToolMenu from './ToolMenu'
 
 export default {
   name: 'flowMainCont',
@@ -49,11 +63,16 @@ export default {
       // 节点相关
       shapeStyle: {
         cx: '0',
-        cy: '0'
+        cy: '0',
+        rx: 60,
+        ry: 36
       },
       isDragging: false,
       selNodeInfo: {},
       showArrow: false,
+      showResize: false,
+      showLineSet: false,
+      clickInfo: {},
       // 连线相关
       drawLineInfo: {
         startNode: '',
@@ -71,16 +90,31 @@ export default {
       },
       lineDrawing: false,
       arrowDirection: '',
+      arrowPadding: 15,
       timer: null,
       drawScale: 2,
-      zoomType: 'zoomIn'
+      zoomType: 'zoomIn',
+      visible: false,
+      menuData: [
+        { title: '删除' }
+      ],
+      menuInfo: {
+        top: 0,
+        left: 0,
+        selType: '',
+        selId: ''
+      }
     }
+  },
+
+  components: {
+    ToolMenu
   },
   computed: {
     ...mapState('flow', ['nodeData', 'selNodeType', 'dragging', 'lineData', 'selLineType', 'drawStyle']),
     arrowStyle () {
       let { width, height, top, left } = this.selNodeInfo
-      let padding = 0
+      let padding = this.arrowPadding
       let objH = 15
       let objW = 15
       width = width / 2
@@ -95,19 +129,41 @@ export default {
       }
       let l = {
         top: top - objH / 2 + 'px',
-        left: left - width - objH / 2 + 'px'
+        left: left - width - objH / 2 - padding + 'px'
       }
       let r = {
         top: top - objH / 2 + 'px',
-        left: left + width - objH / 2 + 'px'
+        left: left + width - objH / 2 + padding + 'px'
       }
       return {
         t, b, l, r
       }
+    },
+    resizeStyle () {
+      let { width, height, top, left } = this.clickInfo
+      let w = width / 2
+      let h = height / 2
+
+      return {
+        nw: { x: left - w, y: top - h },
+        n: { x: left, y: top - h },
+        ne: { x: left + w, y: top - h },
+        w: { x: left - w, y: top },
+        e: { x: left + w, y: top },
+        sw: { x: left - w, y: top + h },
+        s: { x: left, y: top + h },
+        se: { x: left + w, y: top + h },
+        rect: {
+          w: width,
+          h: height,
+          x: left - w,
+          y: top - h
+        }
+      }
     }
   },
   directives: {
-    drag (el, binding, vnode) {
+    node (el, binding, vnode) {
       // vnode.context 相当于 this
       let _this = vnode.context
       let x, y, val
@@ -125,8 +181,21 @@ export default {
         _this.selNodeInfo = Object.assign({}, nodeInfo, wh)
         _this.showArrow = true
       }
-
+      el.oncontextmenu = (ev) => {
+        ev.preventDefault()
+        _this.visible = true
+        _this.showArrow = false
+        let x = ev.offsetX
+        let y = ev.offsetY
+        _this.menuInfo.top = `${y}px`
+        _this.menuInfo.left = `${x}px`
+        _this.menuInfo.selType = el.id.replace(/-.*/g, '')
+        _this.menuInfo.id = el.id
+      }
       el.onmousedown = (ev) => {
+        if (ev.buttons === 2) {
+          return
+        }
         clearTimeout(_this.timer)
         _this.timer = setTimeout(() => {
           _this.isDragging = true
@@ -135,8 +204,9 @@ export default {
           let fn = (ev) => {
             x = ev.offsetX
             y = ev.offsetY
-            val = `translate(${x},${y}) scale(3)`
-            el.setAttribute('transform', val)
+            val = `translate(${x},${y})`
+            // el.setAttribute('transform', val)
+            _this.selNodeInfo.transform = val
             _this.drawLineEnd()
           }
 
@@ -145,7 +215,7 @@ export default {
             if (_this.isDragging) {
               x = ev.offsetX
               y = ev.offsetY
-              val = `translate(${x},${y}) scale(3)`
+              val = `translate(${x},${y})`
 
               _this.UPDATE_NODE({
                 [el.id]: {
@@ -181,8 +251,19 @@ export default {
       }
       el.onclick = () => {
         clearTimeout(_this.timer)
+        _this.showResize = true
+        _this.clickElementId = el.id
+        _this.clickInfo = JSON.parse(JSON.stringify(_this.selNodeInfo))
+      }
+      el.onmouseleave = (ev) => {
+        // _this.selNodeInfo = {}
       }
       el.onmouseover = (ev) => {
+        if (_this.lineDrawing) {
+          _this.arrowPadding = 0
+        } else {
+          _this.arrowPadding = 15
+        }
         getNodeInfo()
         let fn = (ev) => {
           if (ev.target.tagName !== 'IMG') {
@@ -195,17 +276,69 @@ export default {
             if (top - height - padding > y || y > top + height + padding || left - width - padding > x || x > left + width + padding) {
               _this.showArrow = false
               document.querySelector('#draw').removeEventListener('mousemove', fn)
-            } else {
-              _this.showArrow = true
             }
+          }
+          if (!_this.showArrow) {
+            document.querySelector('#draw').removeEventListener('mousemove', fn)
           }
         }
         document.querySelector('#draw').addEventListener('mousemove', fn)
+      }
+    },
+    line (el, binding, vnode) {
+      let _this = vnode.context
+      el.oncontextmenu = (ev) => {
+        ev.preventDefault()
+        _this.visible = true
+        // _this.showArrow = false
+        let x = ev.offsetX
+        let y = ev.offsetY
+        _this.menuInfo.top = `${y}px`
+        _this.menuInfo.left = `${x}px`
+        _this.menuInfo.selType = el.id.replace(/-.*/g, '')
+        _this.menuInfo.id = el.id
+      }
+      el.onclick = (ev) => {
+        _this.clickInfo = _this.deepCopy(_this.lineData[el.id])
+        _this.clickInfo.lineStyle.stroke = '#00a8ff'
+        _this.clickInfo.lineStyle['stroke-dasharray'] = '3 3'
+        _this.showLineSet = true
+      }
+      el.onmousedown = (ev) => {
+        _this.lineDrawing = true
+        _this.drawLineInfo.lineStyle.path = ''
+        // let { path } = _this.lineData[el.id]
       }
     }
   },
   methods: {
     ...mapMutations('flow', ['SEL_NODETYPE', 'UPDATE_NODE', 'UPDATE_LINE', 'UPDATE_DRAWSTYLE']),
+    deleteNode (id = '') {
+      for (var key in this.lineData) {
+        if (this.lineData[key].startNode === id || this.lineData[key].endNode === id) {
+          delete this.lineData[key]
+          this.UPDATE_LINE(this.lineData)
+        }
+      }
+      delete this.nodeData[id]
+      this.UPDATE_NODE(this.nodeData)
+      this.showArrow = false
+      this.showResize = false
+    },
+    deleteHandle (ev) {
+      let { id, selType } = this.menuInfo
+      switch (selType) {
+        case 'node':
+          this.deleteNode(id)
+          break
+        case 'line':
+          delete this.lineData[id]
+          this.UPDATE_NODE(this.lineData)
+          break
+        default:
+          break
+      }
+    },
     wheelHandle (ev) {
       if (ev.deltaY < 0) {
         this.zoomType = 'zoomIn'
@@ -235,7 +368,7 @@ export default {
           [id]: {
             id: 'node-' + ((new Date()).getTime()),
             type: this.selNodeType,
-            transform: `translate(${x},${y}) scale(3)`,
+            transform: `translate(${x},${y})`,
             top: y,
             left: x
           }
@@ -293,7 +426,10 @@ export default {
       }
       return `${startPoint.x},${startPoint.y} ${m1.x},${m1.y} ${m2.x},${m2.y} ${endPoint.x},${endPoint.y}`
     },
-    drawLineStart () {
+    drawLineStart (ev) {
+      if (ev.buttons === 2) {
+        return
+      }
       if (this.arrowDirection && !this.isDragging && this.showArrow) {
         this.lineDrawing = true
         let { id } = this.selNodeInfo
@@ -350,6 +486,17 @@ export default {
         this.arrowDirection = ''
       }
     },
+    deepCopy (s, t = {}) {
+      for (var i in s) {
+        if (typeof s[i] === 'object') {
+          t[i] = (s[i].constructor === Array) ? [] : {}
+          this.deepCopy(s[i], t[i])
+        } else {
+          t[i] = s[i]
+        }
+      }
+      return t
+    },
     drawLineEnd (ev) {
       if (this.lineDrawing && this.arrowDirection && this.showArrow) {
         let { id } = this.selNodeInfo
@@ -382,19 +529,19 @@ export default {
         }
         // vuex 不应该直接用响应式数据，需先进行深拷贝
 
-        let deepCopy = (s, t = {}) => {
-          for (var i in s) {
-            if (typeof s[i] === 'object') {
-              t[i] = (s[i].constructor === Array) ? [] : {}
-              deepCopy(s[i], t[i])
-            } else {
-              t[i] = s[i]
-            }
-          }
-          return t
-        }
+        // let deepCopy = (s, t = {}) => {
+        //   for (var i in s) {
+        //     if (typeof s[i] === 'object') {
+        //       t[i] = (s[i].constructor === Array) ? [] : {}
+        //       deepCopy(s[i], t[i])
+        //     } else {
+        //       t[i] = s[i]
+        //     }
+        //   }
+        //   return t
+        // }
 
-        let data = deepCopy(this.drawLineInfo)
+        let data = this.deepCopy(this.drawLineInfo)
         let lineId = 'line-' + ((new Date()).getTime())
         data.id = lineId
         this.UPDATE_LINE({
@@ -493,6 +640,39 @@ export default {
     document.addEventListener('mouseup', (ev) => {
       if (this.selNodeType) {
         this.SEL_NODETYPE('')
+      }
+      if (this.showResize || this.showLineSet) {
+        this.clickInfo = {}
+        this.showResize = false
+        this.showLineSet = false
+      }
+    })
+    // 阻止右键事件
+    document.addEventListener('contextmenu', (ev) => {
+      ev.preventDefault()
+    })
+    document.addEventListener('keydown', (ev) => {
+      switch (ev.keyCode) {
+        case 46:
+          let { id } = this.clickInfo
+          let selType = id.replace(/-.*/, '')
+          switch (selType) {
+            case 'node':
+              this.deleteNode(id)
+              break
+            case 'line':
+              delete this.lineData[id]
+              this.UPDATE_NODE(this.lineData)
+              this.showLineSet = false
+              this.clickInfo = {}
+              break
+            default:
+              break
+          }
+          break
+
+        default:
+          break
       }
     })
     document.getElementById('flowMainCont').scrollTop = 380

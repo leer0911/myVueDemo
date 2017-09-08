@@ -2,6 +2,7 @@
   <g v-bind="gStyle">
     <slot></slot>
     <g>
+      <polyline v-bind="shadowStyle" />
       <polyline v-bind="style" />
     </g>
   </g>
@@ -18,6 +19,12 @@ export default {
         'stroke-width': 1.2,
         'fill': 'none',
         'marker-end': 'url(#markerArrow)'
+      },
+      defaultShadow: {
+        'stroke-width': 15,
+        'visibility': 'hidden',
+        'pointer-events': 'stroke',
+        'marker-end': ''
       }
     }
   },
@@ -30,6 +37,9 @@ export default {
     },
     style () {
       return Object.assign({}, this.defaultStyle, this.lineStyle)
+    },
+    shadowStyle () {
+      return Object.assign({}, this.defaultStyle, this.defaultShadow, this.lineStyle)
     }
   },
   props: {

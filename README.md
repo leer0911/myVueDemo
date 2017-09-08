@@ -1,6 +1,6 @@
 # platform
 
->  基于VUE+SVG的流程
+>  platform
 
 ## Build Setup
 
@@ -90,4 +90,11 @@ npm install babel-plugin-component -D
     }
   ]]]
 }
+```
+
+## lodash ES6开发环境
+
+```bash
+ yarn add lodash
+ yarn add babel-plugin-lodash -D
 ```

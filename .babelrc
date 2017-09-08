@@ -25,7 +25,8 @@
           "styleLibraryName": "~theme"
         }
       ]
-    ]
+    ],
+    "lodash"
   ],
   "env": {
     "test": {

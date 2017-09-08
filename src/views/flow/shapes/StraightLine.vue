@@ -3,6 +3,7 @@
     <slot></slot>
     <g>
       <line v-bind="style" />
+      <line v-bind="shadowStyle" />
     </g>
   </g>
 </template>
@@ -20,6 +21,12 @@ export default {
         stroke: '#333',
         'stroke-width': 1.2,
         'marker-end': 'url(#markerArrow)'
+      },
+      defaultShadow: {
+        'stroke-width': 15,
+        'visibility': 'hidden',
+        'pointer-events': 'stroke',
+        'marker-end': ''
       }
     }
   },
@@ -32,6 +39,9 @@ export default {
     },
     style () {
       return Object.assign({}, this.defaultStyle, this.lineStyle)
+    },
+    shadowStyle () {
+      return Object.assign({}, this.defaultStyle, this.defaultShadow, this.lineStyle)
     }
   },
   props: {

@@ -21,17 +21,17 @@
         <icon name="narrow"></icon>
       </a>
       <div class="separator"></div>
-      <a href="javascript:void(0);" class="button">
+      <a href="javascript:void(0);" class="button" @click="undo" :style="{color:showUndo?'':'#999'}">
         <icon name="undo"></icon>
       </a>
-      <a href="javascript:void(0);" class="button">
+      <a href="javascript:void(0);" class="button" @click="redo" :style="{color:showRedo?'':'#999'}">
         <icon name="redo"></icon>
       </a>
       <div class="separator"></div>
-      <a href="javascript:void(0);" class="button">
-        <icon name="remove"></icon>
-      </a>
-      <div class="separator"></div>
+      <!-- <a href="javascript:void(0);" class="button" @click="remove">
+                                  <icon name="remove"></icon>
+                                </a>
+                                <div class="separator"></div> -->
     </div>
     <tool-menu :ulStyle="'width:100px;text-align:center'" :visible.sync="visible" :menuData="menuData" @selItme="clickFn"></tool-menu>
   </div>
@@ -83,15 +83,24 @@ export default {
     ToolMenu
   },
   computed: {
-    ...mapState('flow', ['selLineType', 'drawStyle']),
+    ...mapState('flow', ['selLineType', 'drawStyle', 'historyLength', 'historyIndex']),
     zoomRateNum () {
       return this.drawStyle.zoomRate * 100 + '%'
+    },
+    showUndo () {
+      return this.historyLength
+    },
+    showRedo () {
+      return this.historyIndex
     }
   },
   methods: {
-    ...mapMutations('flow', ['SEL_LINETYPE', 'UPDATE_DRAWSTYLE']),
+    ...mapMutations('flow', ['SEL_LINETYPE', 'UPDATE_DRAWSTYLE', 'UNDO', 'REDO']),
     straight () {
       this.SEL_LINETYPE('StraightLine')
+    },
+    remove () {
+      // console.log('a')
     },
     poly () {
       this.SEL_LINETYPE('LinePoly')
@@ -114,6 +123,16 @@ export default {
       if (this.drawStyle.zoomRate > 0.25) {
         let zoomRate = this.drawStyle.zoomRate - 0.25
         this.UPDATE_DRAWSTYLE({ zoomRate })
+      }
+    },
+    undo () {
+      if (this.showUndo) {
+        this.UNDO({})
+      }
+    },
+    redo () {
+      if (this.showRedo) {
+        this.REDO({})
       }
     }
   }

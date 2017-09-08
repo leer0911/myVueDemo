@@ -1,12 +1,12 @@
 <template>
-  <div class="tool-menu-container" v-show="visible">
-    <ul id="toolMenu" class="tool-menu" :style="ulStyle">
-      <li class="tool-menu-item" v-for="(item,index) in menuData" :key="index" @click.stop="clickFn(item)">
-        {{item.title}}
-      </li>
-    </ul>
-    <!-- <div class="tool-menu-mask" @click="close"></div> -->
-  </div>
+  <!-- <div class="tool-menu-container" v-show="visible"> -->
+  <ul id="toolMenu" class="tool-menu" :style="ulStyle" v-if="visible">
+    <li class="tool-menu-item" v-for="(item,index) in menuData" :key="index" @click.stop="clickFn(item)">
+      {{item.title}}
+    </li>
+  </ul>
+  <!-- <div class="tool-menu-mask" @click="close"></div> -->
+  <!-- </div> -->
 </template>
 
 <script>
@@ -25,8 +25,18 @@ export default {
       type: String
     }
   },
+  watch: {
+    visible () {
+      if (this.visible) {
+        document.addEventListener('click', this.documentClick)
+      } else {
+        document.removeEventListener('click', this.documentClick)
+      }
+    }
+  },
   methods: {
     clickFn (item) {
+      this.$emit('update:visible', false)
       this.$emit(
         'selItme', item
       )
@@ -39,10 +49,6 @@ export default {
     documentClick () {
       this.$emit('update:visible', false)
     }
-  },
-
-  mounted () {
-    document.addEventListener('click', this.documentClick)
   }
 }
 </script>
@@ -58,15 +64,11 @@ export default {
   overflow-y: auto;
   overflow-x: hidden;
   max-height: 483px;
-  z-index: 999;
+  z-index: 9999;
   .tool-menu-item {
     transition: all 0.1s ease-in-out;
     padding: 5px;
     border-radius: 10px;
-    border: whiteSmoke solid 3px;
-    .z999 {
-      z-index: 999;
-    }
     cursor: pointer;
     &:hover {
       background: #eee;

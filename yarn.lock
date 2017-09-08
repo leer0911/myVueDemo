@@ -527,6 +527,13 @@ babel-plugin-istanbul@^4.1.1:
     istanbul-lib-instrument "^1.7.2"
     test-exclude "^4.1.1"
 
+babel-plugin-lodash@^3.2.11:
+  version "3.2.11"
+  resolved "http://registry.npm.taobao.org/babel-plugin-lodash/download/babel-plugin-lodash-3.2.11.tgz#21c8fdec9fe1835efaa737873e3902bdd66d5701"
+  dependencies:
+    glob "^7.1.1"
+    lodash "^4.17.2"
+
 babel-plugin-syntax-async-functions@^6.8.0:
   version "6.13.0"
   resolved "http://registry.npm.taobao.org/babel-plugin-syntax-async-functions/download/babel-plugin-syntax-async-functions-6.13.0.tgz#cad9cad1191b5ad634bf30ae0872391e0647be95"
@@ -1863,12 +1870,6 @@ defaults@^1.0.0:
   dependencies:
     clone "^1.0.2"
 
-deffy@^2.0.0:
-  version "2.2.2"
-  resolved "http://registry.npm.taobao.org/deffy/download/deffy-2.2.2.tgz#088f40913cb47078653fa6f697c206e03471d523"
-  dependencies:
-    typpy "^2.0.0"
-
 defined@^1.0.0:
   version "1.0.0"
   resolved "http://registry.npm.taobao.org/defined/download/defined-1.0.0.tgz#c98d9bcef75674188e110969151199e39b1fa693"
@@ -2865,12 +2866,6 @@ function-bind@^1.0.2:
   version "1.1.0"
   resolved "http://registry.npm.taobao.org/function-bind/download/function-bind-1.1.0.tgz#16176714c801798e4e8f2cf7f7529467bb4a5771"
 
-function.name@^1.0.3:
-  version "1.0.8"
-  resolved "http://registry.npm.taobao.org/function.name/download/function.name-1.0.8.tgz#d11c12e4a7dfa7de7c71d9c504567083bb6be05b"
-  dependencies:
-    noop6 "^1.0.1"
-
 gauge@~2.7.3:
   version "2.7.4"
   resolved "http://registry.npm.taobao.org/gauge/download/gauge-2.7.4.tgz#2c03405c7538c39d7eb37b317022e325fb018bf7"
@@ -3491,10 +3486,6 @@ icss-utils@^2.1.0:
   dependencies:
     postcss "^6.0.1"
 
-idy@^1.0.0:
-  version "1.2.7"
-  resolved "http://registry.npm.taobao.org/idy/download/idy-1.2.7.tgz#f70a8cb580b4a7e2477dbb6262a5bf94e0bcd301"
-
 ieee754@^1.1.4:
   version "1.1.8"
   resolved "http://registry.npm.taobao.org/ieee754/download/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
@@ -3508,6 +3499,10 @@ img-stats@^0.5.2:
   resolved "http://registry.npm.taobao.org/img-stats/download/img-stats-0.5.2.tgz#c203496c42f2d9eb2e5ab8232fa756bab32c9e2b"
   dependencies:
     xmldom "^0.1.19"
+
+immutable@^3.8.1:
+  version "3.8.1"
+  resolved "http://registry.npm.taobao.org/immutable/download/immutable-3.8.1.tgz#200807f11ab0f72710ea485542de088075f68cd2"
 
 imurmurhash@^0.1.4:
   version "0.1.4"
@@ -3864,10 +3859,6 @@ istanbul@^0.4.0:
     supports-color "^3.1.0"
     which "^1.1.1"
     wordwrap "^1.0.0"
-
-iterate-object@^1.1.0:
-  version "1.3.2"
-  resolved "http://registry.npm.taobao.org/iterate-object/download/iterate-object-1.3.2.tgz#24ec15affa5d0039e8839695a21c2cae1f45b66b"
 
 js-base64@^2.1.5, js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.1.9"
@@ -4921,10 +4912,6 @@ node-sass@^4.5.3:
     request "^2.79.0"
     sass-graph "^2.1.1"
     stdout-stream "^1.4.0"
-
-noop6@^1.0.1:
-  version "1.0.6"
-  resolved "http://registry.npm.taobao.org/noop6/download/noop6-1.0.6.tgz#eb2b6b5ee1248a02838ee0cea12e8dd5caaf849b"
 
 "nopt@2 || 3", nopt@3.x, nopt@~3.0.1:
   version "3.0.6"
@@ -6610,12 +6597,6 @@ set-immediate-shim@^1.0.1:
   version "1.0.1"
   resolved "http://registry.npm.taobao.org/set-immediate-shim/download/set-immediate-shim-1.0.1.tgz#4b2b1b27eb808a9f8dcc481a58e5e56f599f3f61"
 
-set-or-get@^1.0.0:
-  version "1.2.6"
-  resolved "http://registry.npm.taobao.org/set-or-get/download/set-or-get-1.2.6.tgz#df1e39072b0f3581fb1ea53252939eeed052b031"
-  dependencies:
-    deffy "^2.0.0"
-
 setimmediate@^1.0.4:
   version "1.0.5"
   resolved "http://registry.npm.taobao.org/setimmediate/download/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
@@ -6986,48 +6967,6 @@ supports-color@^4.0.0, supports-color@^4.2.1:
   dependencies:
     has-flag "^2.0.0"
 
-svg.connectable.js@^2.0.0:
-  version "2.0.0"
-  resolved "http://registry.npm.taobao.org/svg.connectable.js/download/svg.connectable.js-2.0.0.tgz#4312063d82d45d649715f0641cd1e152cf839a0a"
-  dependencies:
-    deffy "^2.0.0"
-    idy "^1.0.0"
-    iterate-object "^1.1.0"
-    set-or-get "^1.0.0"
-
-svg.draggable.js@^2.2.1:
-  version "2.2.1"
-  resolved "http://registry.npm.taobao.org/svg.draggable.js/download/svg.draggable.js-2.2.1.tgz#83b00ff6b9babf10fbd1c6f86e83f1ddb0204cbf"
-  dependencies:
-    svg.js "^2.0.1"
-
-svg.draggy.js@^1.1.1:
-  version "1.1.1"
-  resolved "http://registry.npm.taobao.org/svg.draggy.js/download/svg.draggy.js-1.1.1.tgz#c4e2d1702735bf5ec2d504ac44728a8a62a38449"
-
-svg.js@^2.0.1, svg.js@^2.2.5, svg.js@^2.6.2, svg.js@^2.6.3:
-  version "2.6.3"
-  resolved "http://registry.npm.taobao.org/svg.js/download/svg.js-2.6.3.tgz#ac07c61f54ada2745548800307bb45b4b3b519eb"
-
-svg.panzoom.js@^1.2.0:
-  version "1.2.0"
-  resolved "http://registry.npm.taobao.org/svg.panzoom.js/download/svg.panzoom.js-1.2.0.tgz#214b979a554b0b74c045b3817d7c5c358c9557b7"
-  dependencies:
-    svg.js "^2.6.2"
-
-svg.resize.js@^1.4.1:
-  version "1.4.1"
-  resolved "http://registry.npm.taobao.org/svg.resize.js/download/svg.resize.js-1.4.1.tgz#e9b04d1d0d7da39296aa1f8eed1098608347f213"
-  dependencies:
-    svg.js "^2.2.5"
-    svg.select.js "^2.1.2"
-
-svg.select.js@^2.1.2:
-  version "2.1.2"
-  resolved "http://registry.npm.taobao.org/svg.select.js/download/svg.select.js-2.1.2.tgz#e41ce13b1acff43a7441f9f8be87a2319c87be73"
-  dependencies:
-    svg.js "^2.2.5"
-
 svgo@^0.7.0:
   version "0.7.2"
   resolved "http://registry.npm.taobao.org/svgo/download/svgo-0.7.2.tgz#9f5772413952135c6fefbf40afe6a4faa88b4bb5"
@@ -7262,12 +7201,6 @@ type-is@~1.6.15:
 typedarray@^0.0.6:
   version "0.0.6"
   resolved "http://registry.npm.taobao.org/typedarray/download/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
-
-typpy@^2.0.0:
-  version "2.3.8"
-  resolved "http://registry.npm.taobao.org/typpy/download/typpy-2.3.8.tgz#5dfc0a1e9b9e4f9287ef8fa94dce8aa18103e581"
-  dependencies:
-    function.name "^1.0.3"
 
 uglify-js@3.0.x:
   version "3.0.28"
