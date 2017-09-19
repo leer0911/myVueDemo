@@ -5,6 +5,11 @@
       <line v-bind="style" />
       <line v-bind="shadowStyle" />
     </g>
+    <foreignObject :pointer-events="editable ? 'all': 'none'" :transform="textStyle">
+      <div contenteditable="plaintext-only" class="line-text">
+        {{text}}
+      </div>
+    </foreignObject>
   </g>
 </template>
 
@@ -37,6 +42,12 @@ export default {
       }
       return obj
     },
+    textStyle () {
+      let { x1, x2, y1, y2 } = this.lineStyle
+      let x = +((x2 - x1) / 2) + x1
+      let y = +((y2 - y1) / 2) + y1
+      return `translate(${x},${y})`
+    },
     style () {
       return Object.assign({}, this.defaultStyle, this.lineStyle)
     },
@@ -50,11 +61,13 @@ export default {
     },
     gStyle: {
       type: Object
+    },
+    editable: {
+      type: Boolean
+    },
+    text: {
+      type: String
     }
   }
 }
 </script>
-
-<style>
-
-</style>

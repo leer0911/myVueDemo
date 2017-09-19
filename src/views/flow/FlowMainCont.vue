@@ -1,7 +1,7 @@
 <template>
   <div id="flowMainCont" class="flow-main-cont">
     <div style="width:5500px;height:2500px">
-      <div id="draw" class="main-bg" :style="{transform:`scale(${drawStyle.zoomRate})`,transformOrigin:`${drawStyle.origin}`}" @drop.prevent="dropHandle" @dragover.stop.prevent @mousedown="drawLineStart" @mousemove="drawingLine" @mouseup="drawLineEnd" @mousewheel.alt.prevent="wheelHandle">
+      <div id="draw" class="main-bg" :style="{transform:`scale(${drawStyle.zoomRate})`,transformOrigin:`${drawStyle.origin}`}" @drop.prevent="dropHandle" @dragover.stop.prevent @mousedown="drawLineStart" @mousemove="drawingLine" @mouseup="drawLineEnd" @mousewheel.alt.prevent="wheelHandle" @click.stop.prevent="editEnd">
         <svg id="drawSVG" style="width: 1550px; height: 750px; display: block; position: absolute; background-image: none;">
           <defs>
             <marker id="markerArrow" markerWidth="13" markerHeight="13" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
@@ -27,9 +27,11 @@
 
           </g>
           <g id="draw-node">
-            <component :is="selNodeInfo.type" :transform="selNodeInfo.transform" :shapeStyle="shapeStyle" v-if="isDragging">
+            <component :is="selNodeInfo.type" :transform="selNodeInfo.transform" v-if="isDragging" inDraw>
             </component>
-            <component v-for="(item,index) in nodeData" :is="item.type" :key="index" :transform="item.transform" :shapeStyle="shapeStyle" :id="item.id" v-node>
+
+            <!-- 真实节点 -->
+            <component v-for="(item,index) in nodeData" :text="item.text" :editable="editable" :is="item.type" :key="index" :transform="item.transform" :id="item.id" v-node inDraw>
             </component>
 
             <!-- 修改节点大小 -->
@@ -41,10 +43,10 @@
                 <rect :width="resizeStyle.rect.w" :height="resizeStyle.rect.h" fill="none" stroke="#00a8ff" stroke-dasharray="3 3" pointer-events="none"></rect>
               </g>
             </g>
-
           </g>
         </svg>
         <tool-menu :ulStyle="'width:100px;text-align:center'" :visible.sync="visible" :menuData="menuData" @selItme="deleteHandle" :style="{top:menuInfo.top,left:menuInfo.left}"></tool-menu>
+
       </div>
     </div>
   </div>
@@ -61,12 +63,6 @@ export default {
   data () {
     return {
       // 节点相关
-      shapeStyle: {
-        cx: '0',
-        cy: '0',
-        rx: 60,
-        ry: 36
-      },
       isDragging: false,
       selNodeInfo: {},
       showArrow: false,
@@ -88,6 +84,7 @@ export default {
           // y2: ''
         }
       },
+      editable: false,
       lineDrawing: false,
       arrowDirection: '',
       arrowPadding: 15,
@@ -171,8 +168,9 @@ export default {
       // 获取节点信息
       let getNodeInfo = () => {
         // 防止缩放后元素大小更改故除以缩放比例
-        let w = el.getBoundingClientRect().width / _this.drawStyle.zoomRate
-        let h = el.getBoundingClientRect().height / _this.drawStyle.zoomRate
+        let obj = el.getElementsByTagName('g')[0]
+        let w = obj.getBoundingClientRect().width / _this.drawStyle.zoomRate
+        let h = obj.getBoundingClientRect().height / _this.drawStyle.zoomRate
         let wh = {
           width: w,
           height: h
@@ -180,6 +178,21 @@ export default {
         let nodeInfo = _this.nodeData[el.id]
         _this.selNodeInfo = Object.assign({}, nodeInfo, wh)
         _this.showArrow = true
+      }
+      el.ondblclick = (ev) => {
+        _this.editable = true
+        let editor = el.querySelector('.shape-text')
+        el.querySelector('foreignObject').setAttribute('pointer-events', 'all')
+        editor.focus()
+        let fn = () => {
+          let text = editor.innerHTML
+          let result = _this.deepCopy(_this.nodeData[el.id])
+          result.text = text
+          _this.UPDATE_NODE({ [el.id]: result })
+          _this.editable = false
+          document.querySelector('.shape-text').removeEventListener('blur', fn)
+        }
+        document.querySelector('.shape-text').addEventListener('blur', fn)
       }
       el.oncontextmenu = (ev) => {
         ev.preventDefault()
@@ -309,10 +322,30 @@ export default {
         _this.drawLineInfo.lineStyle.path = ''
         // let { path } = _this.lineData[el.id]
       }
+      el.ondblclick = (ev) => {
+        _this.editable = true
+        let editor = el.querySelector('.line-text')
+        el.querySelector('foreignObject').setAttribute('pointer-events', 'all')
+        editor.focus()
+        let fn = () => {
+          let text = editor.innerHTML
+          let result = _this.deepCopy(_this.lineData[el.id])
+          result.text = text
+          _this.UPDATE_LINE({ [el.id]: result })
+          _this.editable = false
+          document.querySelector('.line-text').removeEventListener('blur', fn)
+        }
+        document.querySelector('.line-text').addEventListener('blur', fn)
+      }
     }
   },
   methods: {
     ...mapMutations('flow', ['SEL_NODETYPE', 'UPDATE_NODE', 'UPDATE_LINE', 'UPDATE_DRAWSTYLE']),
+    editEnd () {
+      if (this.editable && !this.showArrow) {
+        this.editable = false
+      }
+    },
     deleteNode (id = '') {
       for (var key in this.lineData) {
         if (this.lineData[key].startNode === id || this.lineData[key].endNode === id) {
@@ -370,7 +403,8 @@ export default {
             type: this.selNodeType,
             transform: `translate(${x},${y})`,
             top: y,
-            left: x
+            left: x,
+            text: ''
           }
         })
         this.showArrow = false
@@ -547,7 +581,8 @@ export default {
           lineStyle: {
             ...style
           },
-          endDirection: this.arrowDirection
+          endDirection: this.arrowDirection,
+          text: ''
         }
         // vuex 不应该直接用响应式数据，需先进行深拷贝
 
@@ -705,7 +740,7 @@ export default {
 
 <style lang="scss">
 .flow-main-cont {
-  right: 0;
+  right: 208px;
   left: 208px;
   top: 90px;
   bottom: 0;
@@ -724,6 +759,22 @@ export default {
     border: 1px solid #cacaca;
     background: url('../../assets/bg.svg') #fff -1px -1px;
     transform-origin: 50% 50%
+  }
+  .shape-text {
+    width: 400px;
+    margin-left: -200px;
+    text-align: center;
+    outline: none;
+    margin-top: -10px;
+  }
+  .line-text {
+    width: 400px;
+    margin-left: -200px;
+    text-align: center;
+    outline: none;
+    margin-top: -10px;
+    z-index: 9999;
+    cursor: pointer;
   }
   .arrow {
     position: absolute;

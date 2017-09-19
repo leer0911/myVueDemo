@@ -2,10 +2,11 @@
   <g v-bind="svgTransform">
     <slot></slot>
     <g transform="translate(0.5,0.5)">
-      <ellipse v-bind="style"></ellipse>
+      <rect v-bind="style">
+      </rect>
     </g>
     <foreignObject :pointer-events="editable ? 'all': 'none'" v-if="inDraw">
-      <div contenteditable="plaintext-only" class="shape-text">
+      <div :contenteditable="editable" class="shape-text">
         {{text}}
       </div>
     </foreignObject>
@@ -15,27 +16,34 @@
 <script>
 import tplMixin from './tplMixin'
 export default {
-  name: 'start',
+  name: 'general',
   mixins: [tplMixin],
   data () {
     return {
       defaultStyle: {
-        cx: '18',
-        cy: '18',
-        rx: '15',
-        ry: '9',
+        x: '2',
+        y: '10',
+        width: 31,
+        height: 16,
+        rx: '2',
+        ry: '2',
         fill: '#fff',
         stroke: '#000',
         'stroke-width': 1,
         'cursor': 'move'
       },
       drawStyle: {
-        rx: '50',
-        ry: '30',
-        cx: '0',
-        cy: '0'
+        rx: '9',
+        ry: '9',
+        x: -53,
+        y: -22,
+        width: 106,
+        height: 44
       }
     }
   }
 }
 </script>
+<style>
+
+</style>

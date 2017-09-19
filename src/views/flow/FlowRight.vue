@@ -1,68 +1,46 @@
 <template>
-  <div id="flowLeftTool" class="flow-left-tool">
+  <div id="flowRight" class="flow-right">
     <div class="container">
       <a href="javascript:void(0)" class="title">
         <icon name="down-arrow" :size="8" class="icon"></icon>
-        <span>流程图</span>
+        <span>节点数据</span>
       </a>
-      <div class="shapeList">
-        <div class="listItem">
-          <div @mousedown="selNode(item.type)" v-for="(item,index) in shapeList" :key="index" :title="item.title" class="item" draggable="true">
-            <svg>
-              <component :is="item.type"></component>
-            </svg>
-          </div>
-        </div>
-      </div>
+      <textarea class="data-textarea" v-model="node">
+      </textarea>
+      <a href="javascript:void(0)" class="title">
+        <icon name="down-arrow" :size="8" class="icon"></icon>
+        <span>连线数据</span>
+      </a>
+      <textarea class="data-textarea" v-model="line">
+      </textarea>
     </div>
   </div>
 </template>
 
 <script>
-import shapesMixin from './shapes/shapesMixin.js'
-import { mapMutations, mapState } from 'vuex'
-
+import { mapState } from 'vuex'
 export default {
-  name: 'flow-left-tool',
-  mixins: [shapesMixin],
-  data () {
-    return {
-      shapeList: [
-        {
-          type: 'Start',
-          title: '开始'
-        },
-        {
-          type: 'General',
-          title: '流程'
-        },
-        {
-          type: 'Decision',
-          title: '判断'
-        }
-      ],
-      svgStyle: {}
-    }
-  },
+  name: 'flow-right',
   computed: {
-    ...mapState('flow', ['inDrawArea', 'selNodeType'])
-  },
-  methods: {
-    ...mapMutations('flow', ['SEL_NODETYPE', 'SET_DRAGGING', 'SET_INDRAWAREA']),
-    selNode (type) {
-      this.SEL_NODETYPE(type)
+    ...mapState('flow', ['lineData', 'nodeData']),
+    node () {
+      return JSON.stringify(this.nodeData)
+    },
+    line () {
+      return JSON.stringify(this.lineData)
     }
   }
 }
 </script>
 
 <style lang="scss">
-.flow-left-tool {
+.flow-right {
   width: 208px;
   position: absolute;
   top: 90px;
   bottom: 0;
   overflow: auto;
+  right: 0;
   background: whiteSmoke;
   svg {
     width: 36px;
@@ -111,5 +89,9 @@ export default {
       }
     }
   }
+}
+.data-textarea{
+  width: 100%;
+  height: 200px;
 }
 </style>

@@ -2,7 +2,7 @@
   <g v-bind="svgTransform">
     <slot></slot>
     <g transform="translate(0.5,0.5)">
-      <ellipse v-bind="style"></ellipse>
+      <path v-bind="style"></path>
     </g>
     <foreignObject :pointer-events="editable ? 'all': 'none'" v-if="inDraw">
       <div contenteditable="plaintext-only" class="shape-text">
@@ -20,20 +20,14 @@ export default {
   data () {
     return {
       defaultStyle: {
-        cx: '18',
-        cy: '18',
-        rx: '15',
-        ry: '9',
+        d: 'M 18 8 L 33 18 L 18 27 L 2 18 Z',
         fill: '#fff',
         stroke: '#000',
         'stroke-width': 1,
         'cursor': 'move'
       },
       drawStyle: {
-        rx: '50',
-        ry: '30',
-        cx: '0',
-        cy: '0'
+        d: 'M 0 -32 L 64 0 L 0 32 L -64 0 Z'
       }
     }
   }
