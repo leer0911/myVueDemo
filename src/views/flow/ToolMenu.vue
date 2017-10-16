@@ -1,12 +1,9 @@
 <template>
-  <!-- <div class="tool-menu-container" v-show="visible"> -->
   <ul id="toolMenu" class="tool-menu" :style="ulStyle" v-if="visible">
     <li class="tool-menu-item" v-for="(item,index) in menuData" :key="index" @click.stop="clickFn(item)">
       {{item.title}}
     </li>
   </ul>
-  <!-- <div class="tool-menu-mask" @click="close"></div> -->
-  <!-- </div> -->
 </template>
 
 <script>

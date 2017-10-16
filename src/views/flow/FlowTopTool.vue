@@ -27,7 +27,7 @@ export default {
             {iconCont(item)}
           </div>
           <div class='ftt-separator' v-show={item.separator} />
-        </div >
+        </div>
       )
     })
     return (
@@ -35,6 +35,7 @@ export default {
         <div class='ftt-container' onClick={this.toolDelegate}>
           {items}
         </div>
+        <tool-menu ulStyle={'width:100px;text-align:center'} visible={this.visible} menuData={this.menuData} onSelItme={this.menuClickFn} />
       </div>
     )
   },
@@ -146,9 +147,19 @@ export default {
       return this.historyIndex
     }
   },
+  watch: {
+    visible (val) {
+      if (val) {
+        document.addEventListener('click', this.documentClick)
+      } else {
+        document.removeEventListener('click', this.documentClick)
+      }
+    }
+  },
   methods: {
     ...mapMutations('flow', ['SEL_LINETYPE', 'UPDATE_DRAWSTYLE', 'UNDO', 'REDO']),
     toolDelegate (event) {
+      event.stopPropagation()
       let dataset = event.target.dataset
       let eventName = dataset.event
       let eventFn = {
@@ -200,6 +211,9 @@ export default {
       let zoomRate = +item.title.replace('%', '') / 100
       this.visible = false
       this.UPDATE_DRAWSTYLE({ zoomRate, origin: 'center' })
+    },
+    documentClick (e) {
+      this.visible = false
     }
   }
 }
@@ -214,7 +228,6 @@ export default {
   border-top: 1px solid $borderColor;
   background: whiteSmoke;
   font-size: 12px;
-  padding-left: 8px;
   .ftt-container {
     width: 100%;
     height: 100%;

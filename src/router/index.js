@@ -7,6 +7,10 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path: '/',
+      redirect: '/flow'
+    },
+    {
       path: '/flow',
       name: 'flow',
       component: flow

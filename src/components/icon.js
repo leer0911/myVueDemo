@@ -13,12 +13,12 @@ export default {
     height: Number
   },
   computed: {
-    fullName () {
+    fullName() {
       const { name, className } = this
       const prefix = `${className}-`
       return name.indexOf(prefix) === 0 ? name : prefix + name
     },
-    style () {
+    style() {
       const { size, width, height } = this
       return {
         width: width ? width + 'px' : (size ? size + 'px' : ''),
@@ -26,20 +26,12 @@ export default {
       }
     }
   },
-  render (h) {
+  render(h) {
     const { className, fullName, style } = this
-    return h('svg', {
-      class: className,
-      style: style,
-      attrs: {
-        'aria-hidden': true
-      }
-    }, [
-      h('use', {
-        attrs: {
-          'xlink:href': `#${fullName}`
-        }
-      })
-    ])
+    return (
+      <svg class={`icon ${className}`} style={style}>
+        <use href={`#${fullName}`} />
+      </svg>
+    )
   }
 }

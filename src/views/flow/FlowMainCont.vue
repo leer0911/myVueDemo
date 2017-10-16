@@ -16,22 +16,23 @@
               <img src="~assets/arrow.png" alt="" :style="arrowStyle.r" class="arrow arrow-right" draggable="false" data-direction="r">
             </div>
           </foreignObject>
-          <g id="draw-line" style="cursor:row-resize;">
 
+          <g id="draw-line" style="cursor:row-resize;">
             <component :is="selLineType" :lineStyle="drawLineInfo.lineStyle" v-if="lineDrawing">
             </component>
             <component v-for="(item,index) in lineData" :is="item.type" :key="index" :lineStyle="item.lineStyle" :id="item.id" v-line>
             </component>
             <component :is="clickInfo.type" :lineStyle="clickInfo.lineStyle" v-show="showLineSet">
             </component>
-
           </g>
+
           <g id="draw-node">
-            <component :is="selNodeInfo.type" :transform="selNodeInfo.transform" v-if="isDragging" inDraw>
+
+            <component :is="selNodeId" :transform="selNodeInfo.transform" v-if="isDragging" inDraw>
             </component>
 
             <!-- 真实节点 -->
-            <component v-for="(item,index) in nodeData" :text="item.text" :editable="editable" :is="item.type" :key="index" :transform="item.transform" :id="item.id" v-node inDraw>
+            <component v-for="(item,index) in nodeData" :text="item.text" :imgSrc="item.imgSrc" :editable="editable" :is="item.type" :key="index" :transform="item.transform" :id="item.id" v-node inDraw>
             </component>
 
             <!-- 修改节点大小 -->
@@ -43,7 +44,9 @@
                 <rect :width="resizeStyle.rect.w" :height="resizeStyle.rect.h" fill="none" stroke="#00a8ff" stroke-dasharray="3 3" pointer-events="none"></rect>
               </g>
             </g>
+
           </g>
+
         </svg>
         <tool-menu :ulStyle="'width:100px;text-align:center'" :visible.sync="visible" :menuData="menuData" @selItme="deleteHandle" :style="{top:menuInfo.top,left:menuInfo.left}"></tool-menu>
 
@@ -60,7 +63,7 @@ import ToolMenu from './ToolMenu'
 export default {
   name: 'flowMainCont',
   mixins: [shapesMixin],
-  data () {
+  data() {
     return {
       // 节点相关
       isDragging: false,
@@ -84,6 +87,7 @@ export default {
           // y2: ''
         }
       },
+      selNodeId: '',
       editable: false,
       lineDrawing: false,
       arrowDirection: '',
@@ -109,7 +113,7 @@ export default {
   },
   computed: {
     ...mapState('flow', ['nodeData', 'selNodeType', 'dragging', 'lineData', 'selLineType', 'drawStyle']),
-    arrowStyle () {
+    arrowStyle() {
       let { width, height, top, left } = this.selNodeInfo
       let padding = this.arrowPadding
       let objH = 15
@@ -136,7 +140,7 @@ export default {
         t, b, l, r
       }
     },
-    resizeStyle () {
+    resizeStyle() {
       let { width, height, top, left } = this.clickInfo
       let w = width / 2
       let h = height / 2
@@ -160,7 +164,7 @@ export default {
     }
   },
   directives: {
-    node (el, binding, vnode) {
+    node(el, binding, vnode) {
       // vnode.context 相当于 this
       let _this = vnode.context
       let x, y, val
@@ -209,6 +213,7 @@ export default {
         if (ev.buttons === 2) {
           return
         }
+        _this.selNodeId = _this.nodeData[el.id].type
         clearTimeout(_this.timer)
         _this.timer = setTimeout(() => {
           _this.isDragging = true
@@ -272,12 +277,13 @@ export default {
         // _this.selNodeInfo = {}
       }
       el.onmouseover = (ev) => {
+        if (_this.isDragging) { return }
         if (_this.lineDrawing) {
           _this.arrowPadding = 0
         } else {
           _this.arrowPadding = 15
         }
-        getNodeInfo()
+        setTimeout(getNodeInfo(), 0)
         let fn = (ev) => {
           if (ev.target.tagName !== 'IMG') {
             let x = ev.offsetX
@@ -298,7 +304,7 @@ export default {
         document.querySelector('#draw').addEventListener('mousemove', fn)
       }
     },
-    line (el, binding, vnode) {
+    line(el, binding, vnode) {
       let _this = vnode.context
       el.oncontextmenu = (ev) => {
         ev.preventDefault()
@@ -341,12 +347,12 @@ export default {
   },
   methods: {
     ...mapMutations('flow', ['SEL_NODETYPE', 'UPDATE_NODE', 'UPDATE_LINE', 'UPDATE_DRAWSTYLE']),
-    editEnd () {
+    editEnd() {
       if (this.editable && !this.showArrow) {
         this.editable = false
       }
     },
-    deleteNode (id = '') {
+    deleteNode(id = '') {
       for (var key in this.lineData) {
         if (this.lineData[key].startNode === id || this.lineData[key].endNode === id) {
           delete this.lineData[key]
@@ -358,7 +364,7 @@ export default {
       this.showArrow = false
       this.showResize = false
     },
-    deleteHandle (ev) {
+    deleteHandle(ev) {
       let { id, selType } = this.menuInfo
       switch (selType) {
         case 'node':
@@ -372,7 +378,7 @@ export default {
           break
       }
     },
-    wheelHandle (ev) {
+    wheelHandle(ev) {
       if (ev.deltaY < 0) {
         this.zoomType = 'zoomIn'
       } else {
@@ -392,7 +398,8 @@ export default {
         }
       }
     },
-    dropHandle (ev) {
+    dropHandle(ev) {
+      let imgSrc = ev.dataTransfer.getData('URL')
       if (this.selNodeType !== '') {
         let x = ev.offsetX
         let y = ev.offsetY
@@ -404,21 +411,22 @@ export default {
             transform: `translate(${x},${y})`,
             top: y,
             left: x,
-            text: ''
+            text: '',
+            imgSrc
           }
         })
         this.showArrow = false
       }
     },
-    enterArrow (ev) {
+    enterArrow(ev) {
       this.arrowDirection = ev.target.dataset.direction
       ev.target.style.opacity = 1
     },
-    outArrow (ev) {
+    outArrow(ev) {
       this.arrowDirection = ''
       ev.target.style.opacity = 0.5
     },
-    computeLine (direction, obj) {
+    computeLine(direction, obj) {
       let { top, left, width, height } = obj
       let w = width / 2
       let h = height / 2
@@ -440,7 +448,7 @@ export default {
       }
       return { top, left }
     },
-    computePolyLine (start, end, direction) {
+    computePolyLine(start, end, direction) {
       let startPoint = {
         x: +(start.split(',')[0]),
         y: +(start.split(',')[1])
@@ -481,7 +489,7 @@ export default {
 
       return `${startPoint.x},${startPoint.y} ${m1.x},${m1.y} ${m2.x},${m2.y} ${endPoint.x},${endPoint.y}`
     },
-    drawLineStart (ev) {
+    drawLineStart(ev) {
       if (ev.buttons === 2) {
         return
       }
@@ -519,7 +527,7 @@ export default {
         }
       }
     },
-    drawingLine (ev) {
+    drawingLine(ev) {
       if (this.lineDrawing && ev.target.tagName !== 'IMG' && !this.isDragging) {
         let top = ev.offsetY
         let left = ev.offsetX
@@ -542,7 +550,7 @@ export default {
         this.arrowDirection = ''
       }
     },
-    deepCopy (s, t = {}) {
+    deepCopy(s, t = {}) {
       for (var i in s) {
         if (typeof s[i] === 'object') {
           t[i] = (s[i].constructor === Array) ? [] : {}
@@ -553,7 +561,7 @@ export default {
       }
       return t
     },
-    drawLineEnd (ev) {
+    drawLineEnd(ev) {
       if (this.lineDrawing && this.arrowDirection && this.showArrow) {
         let { id } = this.selNodeInfo
         let { top, left } = this.computeLine(this.arrowDirection, this.selNodeInfo)
@@ -617,7 +625,7 @@ export default {
       this.lineDrawing = false
       this.arrowDirection = ''
     },
-    updateLine () {
+    updateLine() {
       let { id } = this.selNodeInfo
       let data = {}
 
@@ -693,7 +701,7 @@ export default {
       this.UPDATE_LINE(data)
     }
   },
-  mounted () {
+  mounted() {
     document.addEventListener('mouseup', (ev) => {
       if (this.selNodeType) {
         this.SEL_NODETYPE('')
@@ -744,7 +752,6 @@ export default {
   left: 208px;
   top: 90px;
   bottom: 0;
-  touch-action: none;
   overflow: auto;
   background: #ebebeb;
   position: absolute;
