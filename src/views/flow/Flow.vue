@@ -4,7 +4,7 @@
     <flow-top-tool></flow-top-tool>
     <flow-left-tool></flow-left-tool>
     <flow-main-cont></flow-main-cont>
-    <flow-right></flow-right>
+    <!-- <flow-right></flow-right> -->
   </div>
 </template>
 
