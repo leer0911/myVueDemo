@@ -17,3 +17,9 @@ npm install
 npm run dev
 
 ```
+
+## 其他
+
+JavaScript教程收集归纳，含有阮一峰，JavaScript高级程序设计，你不懂的JavaScript集合。[地址](https://befreefe.github.io/)
+
+[个人博客](https://leer0911.github.io/)
