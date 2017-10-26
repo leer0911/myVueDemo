@@ -1,8 +1,5 @@
 <template>
-  <div id="flowHeader">
-    <div class="flow-title">
-      {{flowTitle}}
-    </div>
+  <div id="flowHeader" class="flow-header">
     <ul class="flow-menu">
       <li v-for="(item,index) in flowMenu" :key="index">{{item.name}}</li>
     </ul>
@@ -12,28 +9,28 @@
 <script>
 export default {
   name: 'flowHeader',
-  data () {
+  data() {
     return {
       flowTitle: '未命名表单',
-      flowMenu: [
-        { name: '文件' },
-        { name: '编辑' }
-      ]
-    }
+      flowMenu: [{ name: '文件' }, { name: '编辑' }]
+    };
   }
-}
+};
 </script>
 
 <style lang="scss">
-.flow-title {
-  padding: 2px 8px;
-  font-size: 16px;
-}
-
-.flow-menu {
-  display: flex;
-  li {
-    padding: 6px 8px;
+.flow-header {
+  background: #1f88d6;
+  color: #fff;
+  .flow-title {
+    padding: 2px 8px;
+    font-size: 16px;
+  }
+  .flow-menu {
+    display: flex;
+    li {
+      padding: 6px 8px;
+    }
   }
 }
 </style>

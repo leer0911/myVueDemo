@@ -223,8 +223,8 @@ export default {
 @import 'flow.scss';
 
 .flow-top-tool {
-  height: 34px;
   border-bottom: 1px solid $borderColor;
+  box-shadow: 0 2px 0px #bbb;
   border-top: 1px solid $borderColor;
   background: whiteSmoke;
   font-size: 12px;

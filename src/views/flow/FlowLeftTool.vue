@@ -25,9 +25,7 @@
               </template>
               <template v-else>
                 <div class="flt-list-item" draggable="true" v-for="(item,index) in tool.listData" :key="index" :title="item.title" @dragstart="selNode(item.type)" @dragend="nodeDragEnd">
-                  <svg class="flt-list-svg">
-                    <component :is="item.type"></component>
-                  </svg>
+                  <icon :name="item.type" :size="30" transform="translate(0.5,0.5)"/>
                 </div>
               </template>
             </div>
@@ -50,21 +48,126 @@ export default {
     return {
       selItem: undefined,
       toolItems: [
-
         {
           title: '流程图',
           listData: [
             {
-              type: 'Start',
+              type: 'start',
               title: '开始'
             },
             {
-              type: 'General',
+              type: 'process',
               title: '流程'
             },
             {
-              type: 'Decision',
+              type: 'decision',
               title: '判断'
+            },
+            {
+              type: 'document',
+              title: '文档'
+            },
+            {
+              type: 'terminator',
+              title: '终端'
+            },
+            {
+              type: 'data',
+              title: '数据'
+            },
+            {
+              type: 'manualInput',
+              title: '输入'
+            },
+            {
+              type: 'storeData',
+              title: '状态数据'
+            }
+          ],
+          show: true
+        },
+        {
+          title: '网络图形',
+          listData: [
+            {
+              type: 'network',
+              title: '网络'
+            },
+            {
+              type: 'virtual-device',
+              title: '虚拟设备'
+            },
+            {
+              type: 'middleware',
+              title: '中间件'
+            },
+            {
+              type: 'monitor',
+              title: '显示器'
+            },
+            {
+              type: 'dome-camera',
+              title: '球形摄像机'
+            },
+            {
+              type: 'gun-camera',
+              title: '枪式摄像机'
+            },
+            {
+              type: 'printer',
+              title: '打印机'
+            },
+            {
+              type: 'network-server',
+              title: '网络服务器'
+            },
+            {
+              type: 'host-hardware',
+              title: '主机硬件'
+            },
+            {
+              type: 'building',
+              title: '建筑'
+            },
+            {
+              type: 'business-services',
+              title: '业务服务'
+            },
+            {
+              type: 'database',
+              title: '数据库'
+            },
+            {
+              type: 'router',
+              title: '路由器'
+            },
+            {
+              type: 'switch',
+              title: '交换机'
+            },
+            {
+              type: 'hubs',
+              title: '集线器'
+            },
+            {
+              type: 'layer-three-switch',
+              title: '三层交换机'
+            },
+            {
+              type: 'unknown-device',
+              title: '未知设备'
+            },
+            {
+              type: 'server',
+              title: '服务器'
+            },
+            {
+              type: 'firewall-fire',
+              title: '防火墙'
+            },
+            {
+              type: 'standard-service',
+              title: '标准服务器'
             }
           ],
           show: true
@@ -113,10 +216,12 @@ export default {
 .flow-left-tool {
   width: 208px;
   position: absolute;
-  top: 92px;
+  top: 66px;
   bottom: 0;
   overflow: auto;
   background: whiteSmoke;
+  box-shadow: -1px 0px 5px #bbb inset;
+  border-right: 1px solid #ddd;
   .flt-list-svg {
     width: 36px;
     height: 36px;
@@ -140,6 +245,9 @@ export default {
       display: flex;
       align-items: center;
       cursor: pointer;
+    }
+    ul{
+      margin-right: 3px;
     }
     .flt-icon {
       margin-right: 8px;
