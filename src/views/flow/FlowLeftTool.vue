@@ -24,7 +24,7 @@
                 </div>
               </template>
               <template v-else>
-                <div class="flt-list-item" draggable="true" v-for="(item,index) in tool.listData" :key="index" :title="item.title" @mousedown="selNode(item.type)">
+                <div class="flt-list-item" draggable="true" v-for="(item,index) in tool.listData" :key="index" :title="item.title" @dragstart="selNode(item.type)" @dragend="nodeDragEnd">
                   <svg class="flt-list-svg">
                     <component :is="item.type"></component>
                   </svg>
@@ -86,6 +86,11 @@ export default {
     selNode (type) {
       this.SEL_NODETYPE(type)
     },
+    nodeDragEnd () {
+      if (this.selNodeType) {
+        this.SEL_NODETYPE('')
+      }
+    },
     dropHandle (e) {
       let reader = new FileReader()
       let file = e.dataTransfer.files[0]
@@ -108,7 +113,7 @@ export default {
 .flow-left-tool {
   width: 208px;
   position: absolute;
-  top: 90px;
+  top: 92px;
   bottom: 0;
   overflow: auto;
   background: whiteSmoke;

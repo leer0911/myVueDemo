@@ -142,7 +142,7 @@ export default {
         t, b, l, r
       }
     },
-    resizeStyle () {
+    resizeStyle() {
       let { width, height, top, left } = this.clickInfo
       let w = width / 2
       let h = height / 2
@@ -185,6 +185,7 @@ export default {
         _this.selNodeInfo = Object.assign({}, nodeInfo, wh)
         _this.showArrow = true
       }
+      // 节点文本编辑≠≠
       el.ondblclick = (ev) => {
         _this.editable = true
         let editor = el.querySelector('.shape-text')
@@ -200,6 +201,7 @@ export default {
         }
         document.querySelector('.shape-text').addEventListener('blur', fn)
       }
+      // 节点删除相关
       el.oncontextmenu = (ev) => {
         ev.preventDefault()
         _this.visible = true
@@ -211,6 +213,7 @@ export default {
         _this.menuInfo.selType = el.id.replace(/-.*/g, '')
         _this.menuInfo.id = el.id
       }
+      // 移动相关
       el.onmousedown = (ev) => {
         if (ev.buttons === 2) {
           return
@@ -269,6 +272,7 @@ export default {
           document.querySelector('#draw').addEventListener('mouseleave', leaveFn)
         }, 200)
       }
+      // 选择节点
       el.onclick = () => {
         clearTimeout(_this.timer)
         _this.showResize = true
@@ -278,6 +282,7 @@ export default {
       el.onmouseleave = (ev) => {
         // _this.selNodeInfo = {}
       }
+      // 连接点显示相关
       el.onmouseover = (ev) => {
         if (_this.isDragging) { return }
         if (_this.lineDrawing) {
@@ -349,6 +354,9 @@ export default {
   },
   methods: {
     ...mapMutations('flow', ['SEL_NODETYPE', 'UPDATE_NODE', 'UPDATE_LINE', 'UPDATE_DRAWSTYLE']),
+    click(){
+      alert('a')
+    },
     editEnd () {
       if (this.editable && !this.showArrow) {
         this.editable = false
@@ -400,6 +408,7 @@ export default {
         }
       }
     },
+    // 节点添加
     dropHandle (ev) {
       let imgSrc = ev.dataTransfer.getData('URL')
       if (this.selNodeType !== '') {
@@ -705,9 +714,6 @@ export default {
   },
   mounted () {
     document.addEventListener('mouseup', (ev) => {
-      if (this.selNodeType) {
-        this.SEL_NODETYPE('')
-      }
       if (this.showResize || this.showLineSet) {
         this.clickInfo = {}
         this.showResize = false
@@ -752,7 +758,7 @@ export default {
 .flow-main-cont {
   right: 0;
   left: 208px;
-  top: 90px;
+  top: 92px;
   bottom: 0;
   overflow: auto;
   background: #ebebeb;
