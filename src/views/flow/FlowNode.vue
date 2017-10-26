@@ -1,6 +1,12 @@
 <template>
-  <div class="flow-node" @dragend="dragEnd()" :transform="option.transform" @mouseover="mouseover()" @mouseout="mouseout()">
-    <icon :name="option.type" :size="80" :transform="option.transform"/>
+  <div class="flow-node" draggable="true" :style="nodePosition" @dragstart="dragstart(option.id)" @mouseover="mouseover(option.id)" @mouseout="mouseout(option.id)">
+    <icon :name="option.type" :size="80" :ref="option.id" />
+    <div id="arrow" class="arrow-wrap" :style="{width:arrow.width,height:arrow.height}" v-if="arrow.show">
+      <img src="~assets/arrow.png" class="arrow arrow-t" draggable="false" data-direction="t">
+      <img src="~assets/arrow.png" class="arrow arrow-b" draggable="false" data-direction="b">
+      <img src="~assets/arrow.png" class="arrow arrow-l" draggable="false" data-direction="l">
+      <img src="~assets/arrow.png" class="arrow arrow-r" draggable="false" data-direction="r">
+    </div>
   </div>
 </template>
 
@@ -11,13 +17,9 @@ export default {
   data() {
     return {
       arrow: {
-        show: true,
-        position: {
-          t: '',
-          b: '',
-          l: '',
-          r: ''
-        }
+        show: false,
+        width: '',
+        height: ''
       }
     };
   },
@@ -27,31 +29,40 @@ export default {
     }
   },
   computed: {
-    ...mapState('flow', ['nodeData'])
+    ...mapState('flow', ['nodeData']),
+    nodePosition() {
+      return {
+        left: `${this.option.left}px`,
+        top: `${this.option.top}px`
+      };
+    }
   },
   methods: {
     ...mapMutations('flow', ['UPDATE_NODE']),
-    mouseover() {
-      this.arrow.show = true;
-      console.log(this.showArrow);
-    },
-    mouseout(){
+    enterArrow() {},
+    outArrow() {},
+    dragstart(id) {
+      let img = this.$refs[id].$el.childNodes[0],
+        dataTransfer = event.dataTransfer;
+
+      dataTransfer.dropEffect = 'copy';
+      dataTransfer.setData('Text', `update:${this.option.id}`);
+      dataTransfer.setDragImage(img, 0, 0);
       this.arrow.show = false;
     },
-    dragEnd() {
-      let x = event.offsetX,
-        y = event.offsetY,
-        val = `translate(${x},${y})`,
-        id = event.target.id;
-
-      this.UPDATE_NODE({
-        [id]: {
-          ...this.nodeData[id],
-          transform: val,
-          top: y,
-          left: x
-        }
-      });
+    mouseover(id) {
+      let { width, height } = this.$refs[id].$el.childNodes[0].getBBox();
+      width = `${width.toFixed(0)}px`;
+      height = `${height.toFixed(0)-3}px`;
+      this.arrow = {
+        ...this.arrow,
+        width,
+        height
+      };
+      this.arrow.show = true;
+    },
+    mouseout() {
+      this.arrow.show = false;
     }
   }
 };
@@ -64,22 +75,38 @@ export default {
     border-right: 1px solid #000;
   }
 }
-.arrow {
+.arrow-wrap {
   position: absolute;
-  opacity: 0.3;
-  z-index: 9999;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   cursor: crosshair;
-  &-bottom {
-    transform: rotate(-180deg);
-  }
-  &-left {
-    transform: rotate(-90deg);
-  }
-  &-right {
-    transform: rotate(90deg);
-  }
-  &:hover {
-    opacity: 1;
+  .arrow {
+    opacity: 0.3;
+    z-index: 9999;
+    &-t {
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -150%);
+    }
+    &-b {
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, 150%);
+    }
+    &-l {
+      bottom: 50%;
+      left: 0;
+      transform: translate(-150%, 50%);
+    }
+    &-r {
+      bottom: 50%;
+      right: 0;
+      transform: translate(150%, 50%);
+    }
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 </style>
