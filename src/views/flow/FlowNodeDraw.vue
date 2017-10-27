@@ -14,14 +14,7 @@ export default {
     FlowNode
   },
   computed: {
-    ...mapState('flow', [
-      'nodeData',
-      'selNodeType',
-      'dragging',
-      'lineData',
-      'selLineType',
-      'drawStyle'
-    ])
+    ...mapState('flow', ['nodeData'])
   }
 };
 </script>

@@ -161,172 +161,172 @@ export default {
     }
   },
   directives: {
-    node(el, binding, vnode) {
-      // vnode.context 相当于 this
-      let _this = vnode.context;
-      let x, y, val;
+    // node(el, binding, vnode) {
+    //   // vnode.context 相当于 this
+    //   let _this = vnode.context;
+    //   let x, y, val;
 
-      // 获取节点信息
-      let getNodeInfo = () => {
-        // 防止缩放后元素大小更改故除以缩放比例
-        let obj = el.getElementsByTagName('g')[0];
-        let w = obj.getBoundingClientRect().width / _this.drawStyle.zoomRate;
-        let h = obj.getBoundingClientRect().height / _this.drawStyle.zoomRate;
-        let wh = {
-          width: w,
-          height: h
-        };
-        let nodeInfo = _this.nodeData[el.id];
-        _this.selNodeInfo = Object.assign({}, nodeInfo, wh);
-        _this.showArrow = true;
-      };
-      // 节点文本编辑≠≠
-      el.ondblclick = ev => {
-        _this.editable = true;
-        let editor = el.querySelector('.shape-text');
-        el.querySelector('foreignObject').setAttribute('pointer-events', 'all');
-        editor.focus();
-        let fn = () => {
-          let text = editor.innerHTML;
-          let result = _this.deepCopy(_this.nodeData[el.id]);
-          result.text = text;
-          _this.UPDATE_NODE({
-            [el.id]: result
-          });
-          _this.editable = false;
-          document.querySelector('.shape-text').removeEventListener('blur', fn);
-        };
-        document.querySelector('.shape-text').addEventListener('blur', fn);
-      };
-      // 节点删除相关
-      el.oncontextmenu = ev => {
-        ev.preventDefault();
-        _this.visible = true;
-        _this.showArrow = false;
-        let x = ev.offsetX;
-        let y = ev.offsetY;
-        _this.menuInfo.top = `${y}px`;
-        _this.menuInfo.left = `${x}px`;
-        _this.menuInfo.selType = el.id.replace(/-.*/g, '');
-        _this.menuInfo.id = el.id;
-      };
-      // 移动相关
-      el.onmousedown = ev => {
-        if (ev.buttons === 2) {
-          return;
-        }
-        _this.selNodeId = _this.nodeData[el.id].type;
-        clearTimeout(_this.timer);
-        _this.timer = setTimeout(() => {
-          _this.isDragging = true;
+    //   // 获取节点信息
+    //   let getNodeInfo = () => {
+    //     // 防止缩放后元素大小更改故除以缩放比例
+    //     let obj = el.getElementsByTagName('g')[0];
+    //     let w = obj.getBoundingClientRect().width / _this.drawStyle.zoomRate;
+    //     let h = obj.getBoundingClientRect().height / _this.drawStyle.zoomRate;
+    //     let wh = {
+    //       width: w,
+    //       height: h
+    //     };
+    //     let nodeInfo = _this.nodeData[el.id];
+    //     _this.selNodeInfo = Object.assign({}, nodeInfo, wh);
+    //     _this.showArrow = true;
+    //   };
+    //   // 节点文本编辑≠≠
+    //   el.ondblclick = ev => {
+    //     _this.editable = true;
+    //     let editor = el.querySelector('.shape-text');
+    //     el.querySelector('foreignObject').setAttribute('pointer-events', 'all');
+    //     editor.focus();
+    //     let fn = () => {
+    //       let text = editor.innerHTML;
+    //       let result = _this.deepCopy(_this.nodeData[el.id]);
+    //       result.text = text;
+    //       _this.UPDATE_NODE({
+    //         [el.id]: result
+    //       });
+    //       _this.editable = false;
+    //       document.querySelector('.shape-text').removeEventListener('blur', fn);
+    //     };
+    //     document.querySelector('.shape-text').addEventListener('blur', fn);
+    //   };
+    //   // 节点删除相关
+    //   el.oncontextmenu = ev => {
+    //     ev.preventDefault();
+    //     _this.visible = true;
+    //     _this.showArrow = false;
+    //     let x = ev.offsetX;
+    //     let y = ev.offsetY;
+    //     _this.menuInfo.top = `${y}px`;
+    //     _this.menuInfo.left = `${x}px`;
+    //     _this.menuInfo.selType = el.id.replace(/-.*/g, '');
+    //     _this.menuInfo.id = el.id;
+    //   };
+    //   // 移动相关
+    //   el.onmousedown = ev => {
+    //     if (ev.buttons === 2) {
+    //       return;
+    //     }
+    //     _this.selNodeId = _this.nodeData[el.id].type;
+    //     clearTimeout(_this.timer);
+    //     _this.timer = setTimeout(() => {
+    //       _this.isDragging = true;
 
-          // 节点移动回调
-          let fn = ev => {
-            x = ev.offsetX;
-            y = ev.offsetY;
-            val = `translate(${x},${y})`;
-            // el.setAttribute('transform', val)
-            _this.selNodeInfo.transform = val;
-            _this.drawLineEnd();
-          };
+    //       // 节点移动回调
+    //       let fn = ev => {
+    //         x = ev.offsetX;
+    //         y = ev.offsetY;
+    //         val = `translate(${x},${y})`;
+    //         // el.setAttribute('transform', val)
+    //         _this.selNodeInfo.transform = val;
+    //         _this.drawLineEnd();
+    //       };
 
-          // 节点移动结束后更新节点
-          let updata = ev => {
-            if (_this.isDragging) {
-              x = ev.offsetX;
-              y = ev.offsetY;
-              val = `translate(${x},${y})`;
+    //       // 节点移动结束后更新节点
+    //       let updata = ev => {
+    //         if (_this.isDragging) {
+    //           x = ev.offsetX;
+    //           y = ev.offsetY;
+    //           val = `translate(${x},${y})`;
 
-              _this.UPDATE_NODE({
-                [el.id]: {
-                  ..._this.nodeData[el.id],
-                  transform: val,
-                  top: y,
-                  left: x
-                }
-              });
-              getNodeInfo();
-            }
-            _this.isDragging = false;
-            _this.updateLine();
-            // 移除画布事件
-            document
-              .querySelector('#draw')
-              .removeEventListener('mousemove', fn);
-            document
-              .querySelector('#draw')
-              .removeEventListener('mouseup', updata);
-            document
-              .querySelector('#draw')
-              .removeEventListener('mouseleave', leaveFn);
-          };
+    //           _this.UPDATE_NODE({
+    //             [el.id]: {
+    //               ..._this.nodeData[el.id],
+    //               transform: val,
+    //               top: y,
+    //               left: x
+    //             }
+    //           });
+    //           getNodeInfo();
+    //         }
+    //         _this.isDragging = false;
+    //         _this.updateLine();
+    //         // 移除画布事件
+    //         document
+    //           .querySelector('#draw')
+    //           .removeEventListener('mousemove', fn);
+    //         document
+    //           .querySelector('#draw')
+    //           .removeEventListener('mouseup', updata);
+    //         document
+    //           .querySelector('#draw')
+    //           .removeEventListener('mouseleave', leaveFn);
+    //       };
 
-          // 离开画布后触发的方法
-          let leaveFn = ev => {
-            if (_this.isDragging) {
-              updata(ev);
-              _this.showArrow = false;
-            }
-          };
+    //       // 离开画布后触发的方法
+    //       let leaveFn = ev => {
+    //         if (_this.isDragging) {
+    //           updata(ev);
+    //           _this.showArrow = false;
+    //         }
+    //       };
 
-          // 添加画布事件
-          document.querySelector('#draw').addEventListener('mousemove', fn);
-          document.querySelector('#draw').addEventListener('mouseup', updata);
-          document
-            .querySelector('#draw')
-            .addEventListener('mouseleave', leaveFn);
-        }, 200);
-      };
-      // 选择节点
-      el.onclick = () => {
-        clearTimeout(_this.timer);
-        _this.showResize = true;
-        _this.clickElementId = el.id;
-        _this.clickInfo = JSON.parse(JSON.stringify(_this.selNodeInfo));
-      };
-      el.onmouseleave = ev => {
-        // _this.selNodeInfo = {}
-      };
-      // 连接点显示相关
-      el.onmouseover = ev => {
-        if (_this.isDragging) {
-          return;
-        }
-        if (_this.lineDrawing) {
-          _this.arrowPadding = 0;
-        } else {
-          _this.arrowPadding = 15;
-        }
-        setTimeout(getNodeInfo(), 0);
-        let fn = ev => {
-          if (ev.target.tagName !== 'IMG') {
-            let x = ev.offsetX;
-            let y = ev.offsetY;
-            let { top, left, width, height } = _this.selNodeInfo;
-            width = width / 2;
-            height = height / 2;
-            let padding = 40;
-            if (
-              top - height - padding > y ||
-              y > top + height + padding ||
-              left - width - padding > x ||
-              x > left + width + padding
-            ) {
-              _this.showArrow = false;
-              document
-                .querySelector('#draw')
-                .removeEventListener('mousemove', fn);
-            }
-          }
-          if (!_this.showArrow) {
-            document
-              .querySelector('#draw')
-              .removeEventListener('mousemove', fn);
-          }
-        };
-        document.querySelector('#draw').addEventListener('mousemove', fn);
-      };
-    },
+    //       // 添加画布事件
+    //       document.querySelector('#draw').addEventListener('mousemove', fn);
+    //       document.querySelector('#draw').addEventListener('mouseup', updata);
+    //       document
+    //         .querySelector('#draw')
+    //         .addEventListener('mouseleave', leaveFn);
+    //     }, 200);
+    //   };
+    //   // 选择节点
+    //   el.onclick = () => {
+    //     clearTimeout(_this.timer);
+    //     _this.showResize = true;
+    //     _this.clickElementId = el.id;
+    //     _this.clickInfo = JSON.parse(JSON.stringify(_this.selNodeInfo));
+    //   };
+    //   el.onmouseleave = ev => {
+    //     // _this.selNodeInfo = {}
+    //   };
+    //   // 连接点显示相关
+    //   el.onmouseover = ev => {
+    //     if (_this.isDragging) {
+    //       return;
+    //     }
+    //     if (_this.lineDrawing) {
+    //       _this.arrowPadding = 0;
+    //     } else {
+    //       _this.arrowPadding = 15;
+    //     }
+    //     setTimeout(getNodeInfo(), 0);
+    //     let fn = ev => {
+    //       if (ev.target.tagName !== 'IMG') {
+    //         let x = ev.offsetX;
+    //         let y = ev.offsetY;
+    //         let { top, left, width, height } = _this.selNodeInfo;
+    //         width = width / 2;
+    //         height = height / 2;
+    //         let padding = 40;
+    //         if (
+    //           top - height - padding > y ||
+    //           y > top + height + padding ||
+    //           left - width - padding > x ||
+    //           x > left + width + padding
+    //         ) {
+    //           _this.showArrow = false;
+    //           document
+    //             .querySelector('#draw')
+    //             .removeEventListener('mousemove', fn);
+    //         }
+    //       }
+    //       if (!_this.showArrow) {
+    //         document
+    //           .querySelector('#draw')
+    //           .removeEventListener('mousemove', fn);
+    //       }
+    //     };
+    //     document.querySelector('#draw').addEventListener('mousemove', fn);
+    //   };
+    // },
     line(el, binding, vnode) {
       let _this = vnode.context;
       el.oncontextmenu = ev => {
@@ -442,20 +442,20 @@ export default {
     },
     // 节点添加
     dropHandle(ev) {
+      // 防止拖拽速度过快导致定位错误
+      if (ev.target.tagName !== 'DIV') return;
       let cont = event.dataTransfer.getData('Text'),
         // 为了解决节点移动时位置问题，节点位置为 update:nodeID的形式
-        key = cont.replace(/\:.*/g,''),
+        key = cont.replace(/\:.*/g, ''),
         x = ev.offsetX,
-        y = ev.offsetY,
-        val = `translate(${x},${y})`
-        ev.dataTransfer.dropEffect = "copy"
+        y = ev.offsetY;
+        ev.dataTransfer.dropEffect = 'copy';
       let fn = {
         update() {
-          let id = cont.replace(/.*\:/g,'')
+          let id = cont.replace(/.*\:/g, '');
           this.UPDATE_NODE({
             [id]: {
               ...this.nodeData[id],
-              transform: val,
               top: y,
               left: x
             }
@@ -468,7 +468,6 @@ export default {
             [id]: {
               id: 'node-' + new Date().getTime(),
               type: this.selNodeType,
-              transform: val,
               top: y,
               left: x,
               text: '',

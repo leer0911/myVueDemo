@@ -1,6 +1,5 @@
 <template>
   <div id="flowHeader" class="flow-header">
-    <icon name="rcslogo" :size="20"></icon>
     <ul class="flow-menu">
       <li v-for="(item,index) in flowMenu" :key="index">{{item.name}}</li>
     </ul>
@@ -32,7 +31,6 @@ export default {
   }
   .flow-menu {
     display: flex;
-    margin-left: 10px;
     li {
       padding: 6px 8px;
       font-weight: bold;
