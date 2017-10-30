@@ -8,6 +8,7 @@
     <div class="draw-wrap">
       <div id="draw" class="main-bg" :style="{transform:`scale(${drawStyle.zoomRate})`,transformOrigin:`${drawStyle.origin}`}" @drop.prevent="dropHandle" @dragover.stop.prevent @mousedown="drawLineStart" @mousemove="drawingLine" @mouseup="drawLineEnd" @mousewheel.alt.prevent="wheelHandle" @click.stop.prevent="editEnd">
         <flow-node-draw></flow-node-draw>
+        <flow-line-draw></flow-line-draw>
         <tool-menu :ulStyle="'width:100px;text-align:center'" :visible.sync="visible" :menuData="menuData" @selItme="deleteHandle" :style="{top:menuInfo.top,left:menuInfo.left}"></tool-menu>
       </div>
     </div>
@@ -15,14 +16,15 @@
 </template>
 
 <script>
-import shapesMixin from './shapes/shapesMixin.js';
+// import shapesMixin from './shapes/shapesMixin.js';
 import { mapState, mapMutations } from 'vuex';
 import ToolMenu from './ToolMenu';
 import FlowNodeDraw from './FlowNodeDraw';
+import FlowLineDraw from './FlowLineDraw';
 
 export default {
-  name: 'flowMainCont',
-  mixins: [shapesMixin],
+  name: 'flowMainDraw',
+  // mixins: [shapesMixin],
   data() {
     return {
       // 节点相关
@@ -72,7 +74,8 @@ export default {
 
   components: {
     ToolMenu,
-    FlowNodeDraw
+    FlowNodeDraw,
+    FlowLineDraw
   },
   computed: {
     ...mapState('flow', [
@@ -83,82 +86,82 @@ export default {
       'selLineType',
       'drawStyle'
     ]),
-    arrowStyle() {
-      let { width, height, top, left } = this.selNodeInfo;
-      let padding = this.arrowPadding;
-      let objH = 15;
-      let objW = 15;
-      width = width / 2;
-      height = height / 2;
-      let t = {
-        top: top - padding - objH / 2 - height + 'px',
-        left: left - objW / 2 + 'px'
-      };
-      let b = {
-        top: top + padding + height - objH / 2 + 'px',
-        left: left - objW / 2 + 'px'
-      };
-      let l = {
-        top: top - objH / 2 + 'px',
-        left: left - width - objH / 2 - padding + 'px'
-      };
-      let r = {
-        top: top - objH / 2 + 'px',
-        left: left + width - objH / 2 + padding + 'px'
-      };
-      return {
-        t,
-        b,
-        l,
-        r
-      };
-    },
-    resizeStyle() {
-      let { width, height, top, left } = this.clickInfo;
-      let w = width / 2;
-      let h = height / 2;
+    // arrowStyle() {
+    //   let { width, height, top, left } = this.selNodeInfo;
+    //   let padding = this.arrowPadding;
+    //   let objH = 15;
+    //   let objW = 15;
+    //   width = width / 2;
+    //   height = height / 2;
+    //   let t = {
+    //     top: top - padding - objH / 2 - height + 'px',
+    //     left: left - objW / 2 + 'px'
+    //   };
+    //   let b = {
+    //     top: top + padding + height - objH / 2 + 'px',
+    //     left: left - objW / 2 + 'px'
+    //   };
+    //   let l = {
+    //     top: top - objH / 2 + 'px',
+    //     left: left - width - objH / 2 - padding + 'px'
+    //   };
+    //   let r = {
+    //     top: top - objH / 2 + 'px',
+    //     left: left + width - objH / 2 + padding + 'px'
+    //   };
+    //   return {
+    //     t,
+    //     b,
+    //     l,
+    //     r
+    //   };
+    // },
+    // resizeStyle() {
+    //   let { width, height, top, left } = this.clickInfo;
+    //   let w = width / 2;
+    //   let h = height / 2;
 
-      return {
-        nw: {
-          x: left - w,
-          y: top - h
-        },
-        n: {
-          x: left,
-          y: top - h
-        },
-        ne: {
-          x: left + w,
-          y: top - h
-        },
-        w: {
-          x: left - w,
-          y: top
-        },
-        e: {
-          x: left + w,
-          y: top
-        },
-        sw: {
-          x: left - w,
-          y: top + h
-        },
-        s: {
-          x: left,
-          y: top + h
-        },
-        se: {
-          x: left + w,
-          y: top + h
-        },
-        rect: {
-          w: width,
-          h: height,
-          x: left - w,
-          y: top - h
-        }
-      };
-    }
+    //   return {
+    //     nw: {
+    //       x: left - w,
+    //       y: top - h
+    //     },
+    //     n: {
+    //       x: left,
+    //       y: top - h
+    //     },
+    //     ne: {
+    //       x: left + w,
+    //       y: top - h
+    //     },
+    //     w: {
+    //       x: left - w,
+    //       y: top
+    //     },
+    //     e: {
+    //       x: left + w,
+    //       y: top
+    //     },
+    //     sw: {
+    //       x: left - w,
+    //       y: top + h
+    //     },
+    //     s: {
+    //       x: left,
+    //       y: top + h
+    //     },
+    //     se: {
+    //       x: left + w,
+    //       y: top + h
+    //     },
+    //     rect: {
+    //       w: width,
+    //       h: height,
+    //       x: left - w,
+    //       y: top - h
+    //     }
+    //   };
+    // }
   },
   directives: {
     // node(el, binding, vnode) {
@@ -377,9 +380,6 @@ export default {
       'UPDATE_LINE',
       'UPDATE_DRAWSTYLE'
     ]),
-    click() {
-      alert('a');
-    },
     editEnd() {
       if (this.editable && !this.showArrow) {
         this.editable = false;

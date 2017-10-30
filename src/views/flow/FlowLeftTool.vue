@@ -42,12 +42,10 @@
 </template>
 
 <script>
-import shapesMixin from './shapes/shapesMixin.js';
 import { mapMutations, mapState } from 'vuex';
 
 export default {
   name: 'flow-left-tool',
-  mixins: [shapesMixin],
   data() {
     return {
       selItem: undefined,

@@ -1,6 +1,6 @@
 <template>
-  <div class="flow-node" draggable="true" :style="nodePosition" @dragstart="nodeDragStart(option.id)" @mouseenter="mouseEnterNode(option.id)">
-    <flow-arrow :nodeId="option.id" :arrowVisible.sync="arrowVisible"></flow-arrow>
+  <div class="flow-node" :draggable="nodeInfo.draggable" :style="nodePosition" @dragstart="nodeDragStart(option.id)" @mouseenter="mouseEnterNode(option.id)" @mouseleave="mouseLeaveNode">
+    <flow-arrow :nodeId="option.id" :arrowVisible.sync="arrowVisible" @arrowPointEnter="arrowPointEnter" @arrowPointLeave="arrowPointLeave"></flow-arrow>
     <icon :name="option.type" :size="80" :ref="option.id" style="cursor:move" />
   </div>
 </template>
@@ -13,7 +13,10 @@ export default {
   name: 'node',
   data() {
     return {
-      arrowVisible
+      arrowVisible: false,
+      nodeInfo: {
+        draggable: true
+      }
     };
   },
   props: {
@@ -21,7 +24,9 @@ export default {
       type: Object
     }
   },
-  components: { FlowArrow },
+  components: {
+    FlowArrow
+  },
   computed: {
     ...mapState('flow', ['nodeData']),
     nodePosition() {
@@ -31,44 +36,72 @@ export default {
       };
     }
   },
+  watch:{
+    nodeData(){
+      this.init()
+    }
+  },
   methods: {
     ...mapMutations('flow', ['UPDATE_NODE']),
     nodeDragStart(id) {
-      let img = this.$refs[id].$el.childNodes[0],
-        dataTransfer = event.dataTransfer;
+      let img = this.$el;
+      let dataTransfer = event.dataTransfer;
       dataTransfer.dropEffect = 'copy';
       dataTransfer.setData('Text', `update:${this.option.id}`);
       dataTransfer.setDragImage(img, 0, 0);
-      this.arrow.show = false;
+
+      this.checkNodes(id);
+    },
+    checkNodes(id) {
+      console.log(this.$refs[id].$el.getBoundingClientRect());
     },
     mouseEnterNode(id) {
-      let { width, height } = this.$refs[id].$el.childNodes[0].getBBox();
-      let padding = 100;
-      width = `${(width + padding).toFixed(0)}px`;
-      height = `${(height + padding - 3).toFixed(0)}px`;
-      this.arrow = {
-        show: true,
-        width,
-        height
-      };
+      this.arrowVisible = true;
     },
     mouseLeaveNode() {
-      this.arrow.show = false;
+      this.arrowVisible = false;
+    },
+    arrowPointEnter() {
+      this.nodeInfo.draggable = false;
+    },
+    arrowPointLeave() {
+      this.nodeInfo.draggable = true;
     },
     getNodeSize() {
-      let id = this.option.id;
-      let { width, height } = this.$refs[id].$el.childNodes[0].getBBox();
+      let id = this.option.id,
+        right,
+        bottom;
+      let { width, height, x, y } = this.$refs[id].$el.childNodes[0].getBBox();
+      let { left, top } = this.nodeData[id];
+      width = +width.toFixed(0);
+      height = +(height - 3).toFixed(0);
+      x = +x.toFixed(0);
+      y = +y.toFixed(0);
+      left += x;
+      top += y;
+      bottom = top + height;
+      right = left + width;
       this.UPDATE_NODE({
         [id]: {
           ...this.nodeData[id],
-          width: width.toFixed(0),
-          height: (height - 3).toFixed(0)
+          width,
+          height,
+          x,
+          y,
+          icon: {
+            width,
+            height,
+            left,
+            right,
+            bottom,
+            top
+          }
         }
       });
     },
     init() {
       let id = this.option.id;
-      if (typeof this.nodeData[id].width !== 'undefined') {
+      if (typeof this.nodeData[id].width === 'undefined') {
         this.getNodeSize();
       }
     }
@@ -84,42 +117,6 @@ export default {
   position: absolute;
   &.flow-node:hover a {
     border-right: 1px solid #000;
-  }
-}
-
-.arrow-wrap {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  padding: 30px;
-  .arrow {
-    opacity: 0.3;
-    z-index: 9999;
-    cursor: crosshair;
-    &-t {
-      top: 0;
-      left: 50%;
-      transform: translate(-50%, 160%);
-    }
-    &-b {
-      bottom: 0;
-      left: 50%;
-      transform: translate(-50%, -160%);
-    }
-    &-l {
-      bottom: 50%;
-      left: 0;
-      transform: translate(160%, 50%);
-    }
-    &-r {
-      bottom: 50%;
-      right: 0;
-      transform: translate(-160%, 50%);
-    }
-    &:hover {
-      opacity: 1;
-    }
   }
 }
 </style>

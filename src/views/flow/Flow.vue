@@ -3,7 +3,7 @@
     <flow-header></flow-header>
     <flow-top-tool></flow-top-tool>
     <flow-left-tool></flow-left-tool>
-    <flow-main-cont></flow-main-cont>
+    <flow-main-draw></flow-main-draw>
     <!-- <flow-right></flow-right> -->
   </div>
 </template>
@@ -13,7 +13,7 @@ import FlowHeader from './FlowHeader'
 import FlowLeftTool from './FlowLeftTool'
 import FlowRight from './FlowRight'
 import FlowTopTool from './FlowTopTool'
-import FlowMainCont from './FlowMainCont'
+import FlowMainDraw from './FlowMainDraw'
 
 export default {
   name: 'flow',
@@ -22,7 +22,7 @@ export default {
     FlowLeftTool,
     FlowRight,
     FlowTopTool,
-    FlowMainCont
+    FlowMainDraw
   }
 }
 </script>
