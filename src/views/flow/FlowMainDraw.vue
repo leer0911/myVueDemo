@@ -5,7 +5,7 @@
       <span class="split-line">/</span>
       <strong>未命名</strong>
     </div>
-    <div class="draw-wrap">
+    <div id="drawContainer" class="draw-wrap">
       <div id="draw" class="main-bg" :style="{transform:`scale(${drawStyle.zoomRate})`,transformOrigin:`${drawStyle.origin}`}" @drop.prevent="dropHandle" @dragover.stop.prevent @mousedown="drawLineStart" @mousemove="drawingLine" @mouseup="drawLineEnd" @mousewheel.alt.prevent="wheelHandle" @click.stop.prevent="editEnd">
         <flow-node-draw></flow-node-draw>
         <flow-line-draw></flow-line-draw>

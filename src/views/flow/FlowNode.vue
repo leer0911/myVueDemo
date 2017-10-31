@@ -41,7 +41,7 @@ export default {
     nodeDragStart(id) {
       let img = this.$el;
       let dataTransfer = event.dataTransfer;
-      dataTransfer.dropEffect = 'copy';
+      dataTransfer.dropEffect = 'move';
       dataTransfer.setData('Text', `update:${this.option.id}`);
       dataTransfer.setDragImage(img, 40, 40);
       this.$emit('nodeDragStart', id);
@@ -98,6 +98,7 @@ export default {
 <style lang="scss">
 .flow-node {
   position: absolute;
+  z-index: 9999;
   &.flow-node:hover a {
     border-right: 1px solid #000;
   }
