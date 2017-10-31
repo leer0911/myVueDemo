@@ -16,7 +16,6 @@
 </template>
 
 <script>
-// import shapesMixin from './shapes/shapesMixin.js';
 import { mapState, mapMutations } from 'vuex';
 import ToolMenu from './ToolMenu';
 import FlowNodeDraw from './FlowNodeDraw';
@@ -24,7 +23,6 @@ import FlowLineDraw from './FlowLineDraw';
 
 export default {
   name: 'flowMainDraw',
-  // mixins: [shapesMixin],
   data() {
     return {
       // 节点相关
@@ -85,7 +83,7 @@ export default {
       'lineData',
       'selLineType',
       'drawStyle'
-    ]),
+    ])
     // arrowStyle() {
     //   let { width, height, top, left } = this.selNodeInfo;
     //   let padding = this.arrowPadding;
@@ -447,9 +445,9 @@ export default {
       let cont = event.dataTransfer.getData('Text'),
         // 为了解决节点移动时位置问题，节点位置为 update:nodeID的形式
         key = cont.replace(/\:.*/g, ''),
-        x = ev.offsetX,
-        y = ev.offsetY;
-        ev.dataTransfer.dropEffect = 'copy';
+        x = ev.offsetX - 40, // 这边的50是设置dragImage时的偏移量，(由于使 iconfont 实际icon与svg存在间隙)
+        y = ev.offsetY - 40;
+      ev.dataTransfer.dropEffect = 'copy';
       let fn = {
         update() {
           let id = cont.replace(/.*\:/g, '');

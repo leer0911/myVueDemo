@@ -1,7 +1,7 @@
 <template>
-  <div class="arrow-wrap" :style="arrow" v-if="arrowVisible">
+  <section class="arrow-wrap" :style="arrow" v-if="arrowVisible">
     <img src="~assets/arrow.png" draggable="false" class="arrow" v-for="(item,index) in ['t','b','l','r']" :key="index" :class="`arrow-${item}`" @mouseover="arrowPointEnter" @mouseleave="arrowPointLeave" @mousedown="drawLineStart(item)" @mouseup="drawLineSuccess(item)">
-  </div>
+  </section>
 </template>
 
 <script>

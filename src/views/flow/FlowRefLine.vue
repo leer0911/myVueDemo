@@ -1,4 +1,11 @@
+<template>
+  <div id='refLine' class="ref-line-wrap">
+    <div class="ref-line ref-line-h" v-for="(item,index) in refLineData" :key="index"></div>
+  </div>
+</template>
 <script>
+import { mapState, mapMutations } from 'vuex';
+
 export default {
   name: 'refLine',
   data(){
@@ -8,22 +15,21 @@ export default {
       }
     }
   },
-  render(h) {
-    let lines = {
-      xt: null,
-      xc: null,
-      xb: null,
-      yl: null,
-      yc: null,
-      yr: null
-    };
-
-    return <div class=".ref-line" />;
+  props:{
+    refLineData:{
+      type:Array
+    }
+  },
+  computed: {
   }
 };
 </script>
 
-<style scoped>
+<style>
+.ref-line-wrap {
+  width: 100%;
+  height: 100%;
+}
 .ref-line {
   opacity: 0.7;
   position: absolute;

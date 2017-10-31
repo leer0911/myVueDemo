@@ -1,5 +1,5 @@
 <template>
-  <div class="flow-node" :draggable="nodeInfo.draggable" :style="nodePosition" @dragstart="nodeDragStart(option.id)" @mouseenter="mouseEnterNode(option.id)" @mouseleave="mouseLeaveNode">
+  <div class="flow-node" :draggable="nodeInfo.draggable" :style="nodePosition" @dragstart="nodeDragStart(option.id)" @drag="nodeDragging(option.id)" @dragend="nodeDragEnd(option.id)" @mouseenter="mouseEnterNode(option.id)" @mouseleave="mouseLeaveNode">
     <flow-arrow :nodeId="option.id" :arrowVisible.sync="arrowVisible" @arrowPointEnter="arrowPointEnter" @arrowPointLeave="arrowPointLeave"></flow-arrow>
     <icon :name="option.type" :size="80" :ref="option.id" style="cursor:move" />
   </div>
@@ -36,11 +36,6 @@ export default {
       };
     }
   },
-  watch:{
-    nodeData(){
-      this.init()
-    }
-  },
   methods: {
     ...mapMutations('flow', ['UPDATE_NODE']),
     nodeDragStart(id) {
@@ -48,12 +43,14 @@ export default {
       let dataTransfer = event.dataTransfer;
       dataTransfer.dropEffect = 'copy';
       dataTransfer.setData('Text', `update:${this.option.id}`);
-      dataTransfer.setDragImage(img, 0, 0);
-
-      this.checkNodes(id);
+      dataTransfer.setDragImage(img, 40, 40);
+      this.$emit('nodeDragStart', id);
     },
-    checkNodes(id) {
-      console.log(this.$refs[id].$el.getBoundingClientRect());
+    nodeDragging(id) {
+      this.$emit('nodeDragging', { id, event });
+    },
+    nodeDragEnd(id) {
+      this.$emit('nodeDragEnd', { id, event });
     },
     mouseEnterNode(id) {
       this.arrowVisible = true;
@@ -68,34 +65,20 @@ export default {
       this.nodeInfo.draggable = true;
     },
     getNodeSize() {
-      let id = this.option.id,
-        right,
-        bottom;
+      let id = this.option.id;
       let { width, height, x, y } = this.$refs[id].$el.childNodes[0].getBBox();
-      let { left, top } = this.nodeData[id];
       width = +width.toFixed(0);
       height = +(height - 3).toFixed(0);
       x = +x.toFixed(0);
       y = +y.toFixed(0);
-      left += x;
-      top += y;
-      bottom = top + height;
-      right = left + width;
+
       this.UPDATE_NODE({
         [id]: {
           ...this.nodeData[id],
           width,
           height,
           x,
-          y,
-          icon: {
-            width,
-            height,
-            left,
-            right,
-            bottom,
-            top
-          }
+          y
         }
       });
     },
