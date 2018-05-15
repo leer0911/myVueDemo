@@ -2,10 +2,13 @@
   <g v-bind="svgTransform">
     <slot></slot>
     <g transform="translate(0.5,0.5)">
-      <image :href="imgSrc" v-bind="style"></image>
+      <image :href="imgSrc"
+        v-bind="style" />
     </g>
-    <foreignObject :pointer-events="editable ? 'all': 'none'" v-if="inDraw">
-      <div contenteditable="plaintext-only" class="shape-text">
+    <foreignObject :pointer-events="editable ? 'all': 'none'"
+      v-if="inDraw">
+      <div contenteditable="plaintext-only"
+        class="shape-text">
         {{text}}
       </div>
     </foreignObject>
@@ -13,7 +16,7 @@
 </template>
 
 <script>
-import tplMixin from './tplMixin'
+import tplMixin from './tplMixin';
 export default {
   name: 'svgImage',
   mixins: [tplMixin],
@@ -31,12 +34,12 @@ export default {
         width: 72,
         height: 72
       }
-    }
+    };
   },
   props: {
     imgSrc: {
       type: String
     }
   }
-}
+};
 </script>

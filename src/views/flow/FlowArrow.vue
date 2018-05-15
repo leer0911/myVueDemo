@@ -1,6 +1,17 @@
 <template>
-  <section class="arrow-wrap" :style="arrow" v-if="arrowVisible">
-    <img src="~assets/arrow.png" draggable="false" class="arrow" v-for="(item,index) in ['t','b','l','r']" :key="index" :class="`arrow-${item}`" @mouseover="arrowPointEnter" @mouseleave="arrowPointLeave" @mousedown="drawLineStart(item)" @mouseup="drawLineSuccess(item)">
+  <section class="arrow-wrap"
+    :style="arrow"
+    v-show="nodeId">
+    <img src="~assets/arrow.png"
+      draggable="false"
+      class="arrow"
+      v-for="(item,index) in ['t','b','l','r']"
+      :key="index"
+      :class="`arrow-${item}`"
+      @mouseover="arrowPointEnter(item)"
+      @mouseleave="arrowPointLeave"
+      @mousedown="drawLineStart(item)"
+      @mouseup="drawLineSuccess(item)">
   </section>
 </template>
 
@@ -9,10 +20,11 @@ import { mapState, mapMutations } from 'vuex';
 import { deepCopy } from './utils';
 
 export default {
-  name: 'name',
+  name: 'Arrow',
   data() {
     return {
       pointRectPadding: 0,
+      a: 123,
       lineInfo: {
         lineDrawing: false,
         type: '',
@@ -28,16 +40,25 @@ export default {
     };
   },
   computed: {
-    ...mapState('flow', ['nodeData', 'lineData', 'selLineType']),
+    ...mapState('flow', [
+      'nodeData',
+      'lineData',
+      'selLineType',
+      'hoverNodeData',
+      'hoverArrowPoint'
+    ]),
+    nodeId() {
+      return this.hoverNodeData.id;
+    },
     arrow() {
-      if (!this.nodeId) {
+      if (!this.nodeId || !this.nodeData[this.nodeId]) {
         return;
       }
       let { width, height, left, top, x, y } = this.nodeData[this.nodeId];
       width = `${(width + this.pointRectPadding).toFixed(0)}px`;
       height = `${(height + this.pointRectPadding).toFixed(0)}px`;
-      left = left + x;
-      top = top + y;
+      left = left + x + 'px';
+      top = top + y + 'px';
       return {
         width,
         height,
@@ -46,46 +67,41 @@ export default {
       };
     }
   },
-  props: {
-    nodeId: {
-      type: String
-    },
-    arrowVisible: {
-      type: Boolean
-    }
-  },
   methods: {
-    ...mapMutations('flow', ['UPDATE_LINE']),
-    arrowPointEnter() {
-      this.$emit('arrowPointEnter');
+    ...mapMutations('flow', ['UPDATE_LINE', 'UPDATE_HOVER_ARROW']),
+    arrowPointEnter(direction) {
+      this.UPDATE_HOVER_ARROW({
+        direction
+      });
     },
     arrowPointLeave() {
-      this.$emit('arrowPointLeave');
+      this.UPDATE_HOVER_ARROW({
+        direction: ''
+      });
     },
     drawLineStart(direction) {
-      this.lineInfo.startPosition = this.getPointPosition(event.target);
+      this.lineInfo.startPosition = { ...this.getPointPosition(event.target) };
       this.lineInfo.lineDrawing = true;
     },
     drawLineSuccess(direction) {
       if (this.lineInfo.lineDrawing) {
         return;
       }
-      console.log(this.lineInfo)
-      this.lineInfo.endPosition = this.getPointPosition(event.target);
-      let lineId = 'line-' + new Date().getTime();
-      let lineData = deepCopy(this.lineInfo);
+      this.lineInfo.endPosition = { ...this.getPointPosition(event.target) };
+      const lineId = 'line-' + new Date().getTime();
+      const lineData = deepCopy(this.lineInfo);
       this.UPDATE_LINE({
         [lineId]: {
           ...lineData,
           lineId,
-          type:this.selLineType
+          type: this.selLineType
         }
       });
       this.lineInfo.lineDrawing = false;
     },
     getPointPosition(target) {
-      let { offsetLeft: x, offsetTop: y } = target;
-      let { top, left } = this.arrow;
+      const { offsetLeft: x, offsetTop: y } = target;
+      const { top, left } = this.arrow;
       return {
         x: x + left,
         y: y + top
@@ -104,14 +120,13 @@ export default {
 <style lang="scss">
 .arrow-wrap {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   cursor: move;
   .arrow {
     opacity: 0.3;
     z-index: 9999;
     cursor: crosshair;
+    position: absolute;
+    z-index: 99999;
     &-t {
       top: 0;
       left: 50%;

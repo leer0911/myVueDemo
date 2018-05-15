@@ -1,6 +1,8 @@
 export const SEL_NODETYPE = 'SEL_NODETYPE'
 export const SEL_LINETYPE = 'SEL_LINETYPE'
 export const UPDATE_NODE = 'UPDATE_NODE'
+export const UPDATE_HOVER_NODE = 'UPDATE_HOVER_NODE'
+export const UPDATE_HOVER_ARROW = 'UPDATE_HOVER_ARROW'
 export const UPDATE_LINE = 'UPDATE_LINE'
 export const UPDATE_DRAWSTYLE = 'UPDATE_DRAWSTYLE'
 export const UNDO = 'UNDO'
@@ -15,6 +17,12 @@ const store = {
     selNodeType: '',
     // 节点数据
     nodeData: {},
+    hoverNodeData: {
+      id: ''
+    },
+    hoverArrowPoint: {
+      direction: ''
+    },
     // 连线数据
     lineData: {},
     // 画布样式
@@ -27,42 +35,52 @@ const store = {
   },
   mutations: {
     // 选中节点类型
-    [SEL_NODETYPE] (state, value = '') {
+    [SEL_NODETYPE](state, value = '') {
       state.selNodeType = value
     },
     // 选中线条类型
-    [SEL_LINETYPE] (state, value = '') {
+    [SEL_LINETYPE](state, value = '') {
       state.selLineType = value
     },
     // 修改画布大小位置等
-    [UPDATE_DRAWSTYLE] (state, value) {
+    [UPDATE_DRAWSTYLE](state, value) {
       state.drawStyle = {
         ...state.drawStyle,
         ...value
       }
     },
-    [UPDATE_NODE] (state, value) {
+    [UPDATE_NODE](state, value) {
       state.nodeData = {
         ...state.nodeData,
         ...value
       }
     },
-    [UPDATE_LINE] (state, value) {
+    [UPDATE_HOVER_NODE](state, value) {
+      state.hoverNodeData = {
+        ...state.hoverNodeData,
+        ...value
+      }
+    },
+    [UPDATE_HOVER_ARROW](state, value) {
+      state.hoverArrowPoint = {
+        ...state.hoverArrowPoint,
+        ...value
+      }
+    },
+    [UPDATE_LINE](state, value) {
       state.lineData = {
         ...state.lineData,
         ...value
       }
     },
-    [UPDATE_HISTORY] (state, value) {
+    [UPDATE_HISTORY](state, value) {
       state.historyLength = value
     },
-    [UPDATE_HISTORYINDEX] (state, value) {
+    [UPDATE_HISTORYINDEX](state, value) {
       state.historyIndex = value
     },
-    [UNDO] (state, value = 0) {
-    },
-    [REDO] (state, value = 0) {
-    }
+    [UNDO](state, value = 0) {},
+    [REDO](state, value = 0) {}
   },
   actions: {
 

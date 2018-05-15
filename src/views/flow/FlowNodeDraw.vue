@@ -1,13 +1,24 @@
 <template>
-  <div id="FlowNodeDarw" class="node-draw" ref="FlowNodeDarw">
-    <flow-node v-for="(item,index) in nodeData" :key="index" :option="item" @nodeDragStart="nodeDragStart" @nodeDragging="nodeDragging" @nodeDragEnd="nodeDragEnd"></flow-node>
-    <flow-ref-line :refLineData="refLineData"></flow-ref-line>
+  <div id="FlowNodeDarw"
+    class="node-draw"
+    ref="FlowNodeDarw"
+    @mouseover.capture="drawMouseover">
+    <flow-arrow></flow-arrow>
+    <flow-node v-for="(item,index) in nodeData"
+      :key="index"
+      :option="item"
+      @nodeDragStart="nodeDragStart"
+      @nodeDragging="nodeDragging"
+      @nodeDragEnd="nodeDragEnd"></flow-node>
+    <!-- <flow-ref-line :refLineData="refLineData"></flow-ref-line> -->
   </div>
 </template>
 
 <script>
 import FlowNode from './FlowNode';
 import FlowRefLine from './FlowRefLine';
+import FlowArrow from './FlowArrow';
+
 import { mapState, mapMutations } from 'vuex';
 
 export default {
@@ -27,7 +38,8 @@ export default {
   },
   components: {
     FlowNode,
-    FlowRefLine
+    FlowRefLine,
+    FlowArrow
   },
   computed: {
     ...mapState('flow', ['nodeData'])
@@ -40,8 +52,16 @@ export default {
     }
   },
   methods: {
+    ...mapMutations('flow', ['UPDATE_HOVER_NODE']),
+    drawMouseover() {
+      if (event.target === event.currentTarget) {
+        this.UPDATE_HOVER_NODE({
+          id: ''
+        });
+      }
+    },
     nodeDragEnd(payload) {
-      this.refLineData = []
+      this.refLineData = [];
     },
     nodeDragging(payload) {
       let fn = () => {

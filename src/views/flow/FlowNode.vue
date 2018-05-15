@@ -1,13 +1,20 @@
 <template>
-  <div class="flow-node" :draggable="nodeInfo.draggable" :style="nodePosition" @dragstart="nodeDragStart(option.id)" @drag="nodeDragging(option.id)" @dragend="nodeDragEnd(option.id)" @mouseenter="mouseEnterNode(option.id)" @mouseleave="mouseLeaveNode">
-    <flow-arrow :nodeId="option.id" :arrowVisible.sync="arrowVisible" @arrowPointEnter="arrowPointEnter" @arrowPointLeave="arrowPointLeave"></flow-arrow>
-    <icon :name="option.type" :size="80" :ref="option.id" style="cursor:move" />
+  <div class="flow-node"
+    :draggable="nodeInfo.draggable"
+    :style="nodePosition"
+    @dragstart="nodeDragStart(option.id)"
+    @drag="nodeDragging(option.id)"
+    @dragend="nodeDragEnd(option.id)"
+    @mouseenter="mouseEnterNode(option.id)">
+    <icon :name="option.type"
+      :size="80"
+      :ref="option.id"
+      style="cursor:move" />
   </div>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import FlowArrow from './FlowArrow';
 
 export default {
   name: 'node',
@@ -24,11 +31,8 @@ export default {
       type: Object
     }
   },
-  components: {
-    FlowArrow
-  },
   computed: {
-    ...mapState('flow', ['nodeData']),
+    ...mapState('flow', ['nodeData', 'hoverArrowPoint']),
     nodePosition() {
       return {
         left: `${this.option.left}px`,
@@ -37,7 +41,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('flow', ['UPDATE_NODE']),
+    ...mapMutations('flow', ['UPDATE_NODE', 'UPDATE_HOVER_NODE']),
     nodeDragStart(id) {
       let img = this.$el;
       let dataTransfer = event.dataTransfer;
@@ -53,16 +57,9 @@ export default {
       this.$emit('nodeDragEnd', { id, event });
     },
     mouseEnterNode(id) {
-      this.arrowVisible = true;
-    },
-    mouseLeaveNode() {
-      this.arrowVisible = false;
-    },
-    arrowPointEnter() {
-      this.nodeInfo.draggable = false;
-    },
-    arrowPointLeave() {
-      this.nodeInfo.draggable = true;
+      this.UPDATE_HOVER_NODE({
+        id
+      });
     },
     getNodeSize() {
       let id = this.option.id;
