@@ -35,7 +35,9 @@ export default {
         endPosition: {
           x: 0,
           y: 0
-        }
+        },
+        startId: '',
+        endId: ''
       }
     };
   },
@@ -72,17 +74,25 @@ export default {
     arrowPointEnter(direction) {},
     arrowPointLeave() {},
     drawLineStart(direction) {
-      this.lineInfo.startPosition = { ...this.getPointPosition(event.target) };
       this.lineDrawing = true;
+      this.lineInfo = {
+        ...this.lineInfo,
+        startPosition: { ...this.getPointPosition(event.target) },
+        startId: JSON.stringify(this.nodeId) // TODO: 只是想取对应的值，而非引用。这种JSON.stringfy的方式不知是否合理
+      };
     },
     drawLineSuccess(direction) {
-      if (!this.lineDrawing) {
+      const { startId } = this.lineInfo;
+      if (!this.lineDrawing || JSON.parse(startId) === this.nodeId) {
         return;
       }
-      this.lineInfo.endPosition = { ...this.getPointPosition(event.target) };
+      this.lineInfo = {
+        ...this.lineInfo,
+        endPosition: { ...this.getPointPosition(event.target) },
+        endId: this.nodeId
+      };
       const lineId = 'line-' + new Date().getTime();
       const lineData = deepCopy(this.lineInfo);
-      console.log(this.lineInfo);
       this.UPDATE_LINE({
         [lineId]: {
           ...lineData,
