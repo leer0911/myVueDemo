@@ -2,7 +2,6 @@ export const SEL_NODETYPE = 'SEL_NODETYPE'
 export const SEL_LINETYPE = 'SEL_LINETYPE'
 export const UPDATE_NODE = 'UPDATE_NODE'
 export const UPDATE_HOVER_NODE = 'UPDATE_HOVER_NODE'
-export const UPDATE_HOVER_ARROW = 'UPDATE_HOVER_ARROW'
 export const UPDATE_LINE = 'UPDATE_LINE'
 export const UPDATE_DRAWSTYLE = 'UPDATE_DRAWSTYLE'
 export const UNDO = 'UNDO'
@@ -19,9 +18,6 @@ const store = {
     nodeData: {},
     hoverNodeData: {
       id: ''
-    },
-    hoverArrowPoint: {
-      direction: ''
     },
     // 连线数据
     lineData: {},
@@ -58,12 +54,6 @@ const store = {
     [UPDATE_HOVER_NODE](state, value) {
       state.hoverNodeData = {
         ...state.hoverNodeData,
-        ...value
-      }
-    },
-    [UPDATE_HOVER_ARROW](state, value) {
-      state.hoverArrowPoint = {
-        ...state.hoverArrowPoint,
         ...value
       }
     },

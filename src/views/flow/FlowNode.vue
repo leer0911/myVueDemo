@@ -32,7 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('flow', ['nodeData', 'hoverArrowPoint']),
+    ...mapState('flow', ['nodeData']),
     nodePosition() {
       return {
         left: `${this.option.left}px`,

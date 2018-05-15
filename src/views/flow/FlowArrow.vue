@@ -17,14 +17,14 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import { deepCopy } from './utils';
+import { deepCopy, pxToNumber, getRelativePosition } from './utils';
 
 export default {
   name: 'Arrow',
   data() {
     return {
       pointRectPadding: 0,
-      a: 123,
+      lineDrawing: false,
       lineInfo: {
         lineDrawing: false,
         type: '',
@@ -68,28 +68,21 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('flow', ['UPDATE_LINE', 'UPDATE_HOVER_ARROW']),
-    arrowPointEnter(direction) {
-      this.UPDATE_HOVER_ARROW({
-        direction
-      });
-    },
-    arrowPointLeave() {
-      this.UPDATE_HOVER_ARROW({
-        direction: ''
-      });
-    },
+    ...mapMutations('flow', ['UPDATE_LINE']),
+    arrowPointEnter(direction) {},
+    arrowPointLeave() {},
     drawLineStart(direction) {
       this.lineInfo.startPosition = { ...this.getPointPosition(event.target) };
-      this.lineInfo.lineDrawing = true;
+      this.lineDrawing = true;
     },
     drawLineSuccess(direction) {
-      if (this.lineInfo.lineDrawing) {
+      if (!this.lineDrawing) {
         return;
       }
       this.lineInfo.endPosition = { ...this.getPointPosition(event.target) };
       const lineId = 'line-' + new Date().getTime();
       const lineData = deepCopy(this.lineInfo);
+      console.log(this.lineInfo);
       this.UPDATE_LINE({
         [lineId]: {
           ...lineData,
@@ -100,15 +93,15 @@ export default {
       this.lineInfo.lineDrawing = false;
     },
     getPointPosition(target) {
-      const { offsetLeft: x, offsetTop: y } = target;
-      const { top, left } = this.arrow;
+      const { top, left } = getRelativePosition(target, this.$parent.$el);
+      const { width, height } = target.getBoundingClientRect();
       return {
-        x: x + left,
-        y: y + top
+        x: left + width / 2,
+        y: top + height / 2
       };
     },
     drawLineFail() {
-      this.lineInfo.lineDrawing = false;
+      this.lineDrawing = false;
     }
   },
   mounted() {

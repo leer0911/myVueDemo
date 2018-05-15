@@ -30,8 +30,45 @@ const getElementOffset = function (element, targetId) {
   };
 }
 
+const pxToNumber = function (s) {
+  return Number(s.replace('px', ''))
+}
+
+const getEleTopAndLeft = function (ele) {
+  const {
+    left,
+    top
+  } = ele.getBoundingClientRect()
+  const {
+    scrollLeft,
+    scrollTop
+  } = document.documentElement
+  return {
+    top: top + scrollTop,
+    left: left + scrollLeft
+  }
+}
+
+const getRelativePosition = function (son, parent) {
+  const {
+    left: sonLeft,
+    top: sonTop
+  } = getEleTopAndLeft(son)
+  const {
+    left: parentLeft,
+    top: parentTop
+  } = getEleTopAndLeft(parent)
+  return {
+    top: sonTop - parentTop,
+    left: sonLeft - parentLeft
+  }
+}
+
 
 export {
   deepCopy,
-  getElementOffset
+  getElementOffset,
+  pxToNumber,
+  getEleTopAndLeft,
+  getRelativePosition
 };
