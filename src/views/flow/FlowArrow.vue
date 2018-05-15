@@ -78,7 +78,7 @@ export default {
       this.lineInfo = {
         ...this.lineInfo,
         startPosition: { ...this.getPointPosition(event.target) },
-        startId: JSON.stringify(this.nodeId) // TODO: 只是想取对应的值，而非引用。这种JSON.stringfy的方式不知是否合理
+        startId: this.nodeId
       };
       this.$parent.$el.addEventListener('mousemove', this.lineDrawingHandle);
     },
@@ -98,7 +98,7 @@ export default {
     drawLineSuccess(direction) {
       const { startId } = this.lineInfo;
       this.$parent.$el.removeEventListener('mousemove', this.lineDrawingHandle);
-      if (!this.lineDrawing || JSON.parse(startId) === this.nodeId) {
+      if (!this.lineDrawing || startId === this.nodeId) {
         return;
       }
       this.lineInfo = {

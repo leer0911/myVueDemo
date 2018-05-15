@@ -59,7 +59,6 @@ export default {
   },
   computed: {
     style() {
-      console.log('option', this.option);
       let { x: x1, y: y1 } = this.option.startPosition;
       let { x: x2, y: y2 } = this.option.endPosition;
       return {

@@ -42,11 +42,12 @@ export default {
       'selNodeType',
       'lineData',
       'selLineType',
-      'drawStyle'
+      'drawStyle',
+      'hoverNodeData'
     ])
   },
   methods: {
-    ...mapMutations('flow', ['UPDATE_NODE', 'UPDATE_DRAWSTYLE']),
+    ...mapMutations('flow', ['UPDATE_NODE', 'UPDATE_DRAWSTYLE', 'UPDATE_LINE']),
     wheelHandle(ev) {
       if (ev.deltaY < 0) {
         this.zoomType = 'zoomIn';
@@ -73,6 +74,42 @@ export default {
         }
       }
     },
+    updateLine(nodeOffsetX, nodeOffsetY) {
+      let { id } = this.hoverNodeData;
+      let data = {};
+      for (var key in this.lineData) {
+        const {
+          startId,
+          endId,
+          startPosition: { x: sx, y: sy },
+          endPosition: { x: ex, y: ey }
+        } = this.lineData[key];
+        if (startId === id) {
+          data = {
+            ...data,
+            [key]: {
+              ...this.lineData[key],
+              startPosition: {
+                x: sx + nodeOffsetX,
+                y: sy + nodeOffsetY
+              }
+            }
+          };
+        } else if (endId === id) {
+          data = {
+            ...data,
+            [key]: {
+              ...this.lineData[key],
+              endPosition: {
+                x: ex + nodeOffsetX,
+                y: ey + nodeOffsetY
+              }
+            }
+          };
+        }
+      }
+      this.UPDATE_LINE(data);
+    },
     dropHandle(ev) {
       // 防止拖拽速度过快导致定位错误
       if (ev.target.tagName !== 'DIV') return;
@@ -85,6 +122,9 @@ export default {
       let fn = {
         update() {
           let id = cont.replace(/.*\:/g, '');
+          const { left, top } = this.nodeData[id];
+          const nodeOffsetX = x - left;
+          const nodeOffsetY = y - top;
           this.UPDATE_NODE({
             [id]: {
               ...this.nodeData[id],
@@ -92,6 +132,8 @@ export default {
               left: x
             }
           });
+          console.log(nodeOffsetX, nodeOffsetY);
+          this.updateLine(nodeOffsetX, nodeOffsetY);
         },
         add() {
           let id = 'node-' + new Date().getTime();
