@@ -3,26 +3,26 @@ import { mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'line',
-  render(h){
+  render(h) {
     const realLine = {
-      attrs:{
+      attrs: {
         ...this.style
       }
-    }
+    };
     const shadowLine = {
-      attrs:{
+      attrs: {
         ...this.shadowStyle
       }
-    }
-    const changeLineType = (type)=>{
+    };
+    const changeLineType = type => {
       switch (type) {
         case 'StraightLine':
           return (
             <g>
-              <line {...realLine}/>
+              <line {...realLine} />
               <line {...shadowLine} />
             </g>
-          )
+          );
           break;
         case 'LinePoly':
           return (
@@ -30,15 +30,11 @@ export default {
               <polyline {...realLine} />
               <polyline {...shadowLine} />
             </g>
-          )
+          );
           break;
       }
-    }
-    return (
-      <g>
-        {changeLineType(this.option.type)}
-      </g>
-    )
+    };
+    return <g>{changeLineType(this.option.type)}</g>;
   },
   data() {
     return {
@@ -63,6 +59,7 @@ export default {
   },
   computed: {
     style() {
+      console.log('option', this.option);
       let { x: x1, y: y1 } = this.option.startPosition;
       let { x: x2, y: y2 } = this.option.endPosition;
       return {
@@ -80,11 +77,8 @@ export default {
       };
     }
   },
-  methods: {
-  },
-  mounted() {
-
-  }
+  methods: {},
+  mounted() {}
 };
 </script>
 

@@ -3,6 +3,7 @@ export const SEL_LINETYPE = 'SEL_LINETYPE'
 export const UPDATE_NODE = 'UPDATE_NODE'
 export const UPDATE_HOVER_NODE = 'UPDATE_HOVER_NODE'
 export const UPDATE_LINE = 'UPDATE_LINE'
+export const UPDATE_SHADOW_LINE = 'UPDATE_SHADOW_LINE'
 export const UPDATE_DRAWSTYLE = 'UPDATE_DRAWSTYLE'
 export const UNDO = 'UNDO'
 export const REDO = 'REDO'
@@ -20,7 +21,8 @@ const store = {
       id: ''
     },
     // 连线数据
-    lineData: {},
+    lineData: null,
+    shadowLineData: null,
     // 画布样式
     drawStyle: {
       zoomRate: 1 // 全局缩放比例
@@ -62,6 +64,9 @@ const store = {
         ...state.lineData,
         ...value
       }
+    },
+    [UPDATE_SHADOW_LINE](state, value) {
+      state.shadowLineData = value
     },
     [UPDATE_HISTORY](state, value) {
       state.historyLength = value

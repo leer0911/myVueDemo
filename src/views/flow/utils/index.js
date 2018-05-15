@@ -18,11 +18,9 @@ const getElementOffset = function (element, targetId) {
   let current = element.offsetParent;
 
   while (current.offsetParent.id !== targetId) {
-    console.log(current.offsetLeft)
     left += current.offsetLeft;
     top += current.offsetTop;
     current = current.offsetParent;
-    // console.log(current)
   }
   return {
     top,

@@ -70,7 +70,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('flow', ['UPDATE_LINE']),
+    ...mapMutations('flow', ['UPDATE_LINE', 'UPDATE_SHADOW_LINE']),
     arrowPointEnter(direction) {},
     arrowPointLeave() {},
     drawLineStart(direction) {
@@ -80,9 +80,24 @@ export default {
         startPosition: { ...this.getPointPosition(event.target) },
         startId: JSON.stringify(this.nodeId) // TODO: 只是想取对应的值，而非引用。这种JSON.stringfy的方式不知是否合理
       };
+      this.$parent.$el.addEventListener('mousemove', this.lineDrawingHandle);
+    },
+    lineDrawingHandle() {
+      const { target, currentTarget, clientX, clientY } = event;
+      const { top, left } = this.$parent.$el.getBoundingClientRect();
+      const { startPosition } = this.lineInfo;
+      this.UPDATE_SHADOW_LINE({
+        startPosition,
+        endPosition: {
+          x: clientX - left,
+          y: clientY - top
+        },
+        type: this.selLineType
+      });
     },
     drawLineSuccess(direction) {
       const { startId } = this.lineInfo;
+      this.$parent.$el.removeEventListener('mousemove', this.lineDrawingHandle);
       if (!this.lineDrawing || JSON.parse(startId) === this.nodeId) {
         return;
       }
@@ -110,12 +125,17 @@ export default {
         y: top + height / 2
       };
     },
-    drawLineFail() {
+    drawLineEnd() {
       this.lineDrawing = false;
+      this.UPDATE_SHADOW_LINE(null);
+      this.$parent.$el.removeEventListener('mousemove', this.lineDrawingHandle);
     }
   },
   mounted() {
-    document.addEventListener('mouseup', this.drawLineFail);
+    document.addEventListener('mouseup', this.drawLineEnd);
+  },
+  destroyed() {
+    document.removeEventListener('mouseup', this.drawLineEnd);
   }
 };
 </script>
