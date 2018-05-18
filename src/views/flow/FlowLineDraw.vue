@@ -20,17 +20,20 @@
       v-if="lineData"></flow-line>
     <flow-line :option="shadowLineData"
       v-if="shadowLineData"></flow-line>
+    <flow-path></flow-path>
   </svg>
 </template>
 
 <script>
 import { mapState, mapMutations } from 'vuex';
 import FlowLine from './FlowLine';
+import FlowPath from './FlowPath';
 
 export default {
   name: 'FlowLineDarw',
   components: {
-    FlowLine
+    FlowLine,
+    FlowPath
   },
   computed: {
     ...mapState('flow', ['lineData', 'shadowLineData'])
@@ -40,5 +43,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

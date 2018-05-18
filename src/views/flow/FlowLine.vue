@@ -2,7 +2,7 @@
 import { mapState, mapMutations } from 'vuex';
 
 export default {
-  name: 'line',
+  name: 'FlowLine',
   render(h) {
     const realLine = {
       attrs: {
@@ -82,5 +82,4 @@ export default {
 </script>
 
 <style lang="scss">
-
 </style>

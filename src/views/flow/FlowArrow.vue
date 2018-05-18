@@ -18,6 +18,7 @@
 <script>
 import { mapState, mapMutations } from 'vuex';
 import { deepCopy, pxToNumber, getRelativePosition } from './utils';
+import * as d3 from 'd3';
 
 export default {
   name: 'Arrow',
