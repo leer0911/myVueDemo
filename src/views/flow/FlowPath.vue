@@ -10,7 +10,7 @@ export default {
         id="link-1-2"
         class="link"
         marker-end="url(#markerArrow)"
-        d={this.dd}
+        d={this.optionD}
       />
     );
     return a;
@@ -21,23 +21,17 @@ export default {
     };
   },
   props: {
-    option: {
-      type: Object,
-      default() {
-        return {
-          source: {
-            x: 200,
-            y: 200
-          },
-          target: {
-            x: 200,
-            y: 300
-          }
-        };
-      }
+    lineOption: {
+      type: Object
     }
   },
   computed: {
+    option(){
+      return {
+        source:{...this.lineOption.startPosition},
+        target:{...this.lineOption.endPosition}
+      }
+    },
     nodeData() {
       return [
         {
@@ -86,6 +80,33 @@ export default {
         sc,
         tc
       };
+    },
+    optionD(){
+      const points = [
+        {
+          x: this.link.source.x,
+          y: this.link.source.y
+        },
+        {
+          x: this.link.sc.x,
+          y: this.link.sc.y
+        },
+        {
+          x: this.link.tc.x,
+          y: this.link.tc.y
+        },
+        {
+          x: this.link.target.x,
+          y: this.link.target.y
+        }
+      ];
+      this.controlPointLayout(this.link, this.link);
+      const line = d3
+        .line()
+        .x(d => d.x)
+        .y(d => d.y)
+        .curve(d3.curveBasis);
+      return line(points);
     }
   },
   methods: {
@@ -104,7 +125,7 @@ export default {
       };
     },
     controlPointLayout() {
-      const gravity = -100;
+      const gravity = -10;
       const springLength = 0;
       const springCoeff = 0.0008;
       const timeStep = 5;
@@ -140,42 +161,42 @@ export default {
         tc.fx += (sc.x - tc.x) * force;
         tc.fy += (sc.y - tc.y) * force;
 
-        // r = this.distance(this.link.source, sc);
-        // sc.fx +=
-        //   (this.link.source.x - sc.x) * springCoeff * (r - springLength) / r;
-        // sc.fy +=
-        //   (this.link.source.y - sc.y) * springCoeff * (r - springLength) / r;
+        r = this.distance(this.option.source, sc);
+        sc.fx +=
+          (this.option.source.x - sc.x) * springCoeff * (r - springLength) / r;
+        sc.fy +=
+          (this.option.source.y - sc.y) * springCoeff * (r - springLength) / r;
 
-        // r = this.distance(sc, tc);
-        // sc.fx += (tc.x - sc.x) * springCoeff * (r - springLength) / r;
-        // sc.fy += (tc.y - sc.y) * springCoeff * (r - springLength) / r;
-        // tc.fx -= (tc.x - sc.x) * springCoeff * (r - springLength) / r;
-        // tc.fy -= (tc.y - sc.y) * springCoeff * (r - springLength) / r;
+        r = this.distance(sc, tc);
+        sc.fx += (tc.x - sc.x) * springCoeff * (r - springLength) / r;
+        sc.fy += (tc.y - sc.y) * springCoeff * (r - springLength) / r;
+        tc.fx -= (tc.x - sc.x) * springCoeff * (r - springLength) / r;
+        tc.fy -= (tc.y - sc.y) * springCoeff * (r - springLength) / r;
 
-        // r = this.distance(this.link.target, tc);
-        // tc.fx +=
-        //   (this.link.target.x - tc.x) * springCoeff * (r - springLength) / r;
-        // tc.fy +=
-        //   (this.link.target.y - tc.y) * springCoeff * (r - springLength) / r;
+        r = this.distance(this.option.target, tc);
+        tc.fx +=
+          (this.option.target.x - tc.x) * springCoeff * (r - springLength) / r;
+        tc.fy +=
+          (this.option.target.y - tc.y) * springCoeff * (r - springLength) / r;
 
-        // sc.fx -= sc.vx * dragCoeff;
-        // sc.fy -= sc.vy * dragCoeff;
-        // tc.fx -= tc.vx * dragCoeff;
-        // tc.fy -= tc.vy * dragCoeff;
+        sc.fx -= sc.vx * dragCoeff;
+        sc.fy -= sc.vy * dragCoeff;
+        tc.fx -= tc.vx * dragCoeff;
+        tc.fy -= tc.vy * dragCoeff;
 
-        // sc.vx += sc.fx * timeStep;
-        // sc.vy += sc.fy * timeStep;
-        // sc.x += sc.vx * timeStep;
-        // sc.y += sc.vy * timeStep;
+        sc.vx += sc.fx * timeStep;
+        sc.vy += sc.fy * timeStep;
+        sc.x += sc.vx * timeStep;
+        sc.y += sc.vy * timeStep;
 
-        // tc.vx += tc.fx * timeStep;
-        // tc.vy += tc.fy * timeStep;
-        // tc.x += tc.vx * timeStep;
-        // tc.y += tc.vy * timeStep;
-        sc.x = 112;
-        sc.y = 218;
-        tc.x = 112;
-        tc.y = 280;
+        tc.vx += tc.fx * timeStep;
+        tc.vy += tc.fy * timeStep;
+        tc.x += tc.vx * timeStep;
+        tc.y += tc.vy * timeStep;
+        // sc.x = 112;
+        // sc.y = 218;
+        // tc.x = 112;
+        // tc.y = 280;
       }
       return {
         sc,
@@ -184,31 +205,7 @@ export default {
     }
   },
   mounted() {
-    const points = [
-      {
-        x: this.link.source.x,
-        y: this.link.source.y
-      },
-      {
-        x: this.link.sc.x,
-        y: this.link.sc.y
-      },
-      {
-        x: this.link.tc.x,
-        y: this.link.tc.y
-      },
-      {
-        x: this.link.target.x,
-        y: this.link.target.y
-      }
-    ];
-    this.controlPointLayout(this.link, this.link);
-    const line = d3
-      .line()
-      .x(d => d.x)
-      .y(d => d.y)
-      .curve(d3.curveBasis);
-    this.dd = line(points);
+
   }
 };
 </script>

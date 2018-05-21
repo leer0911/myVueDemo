@@ -132,8 +132,7 @@ export default {
               left: x
             }
           });
-          console.log(nodeOffsetX, nodeOffsetY);
-          this.updateLine(nodeOffsetX, nodeOffsetY);
+          // this.updateLine(nodeOffsetX, nodeOffsetY);
         },
         add() {
           let id = 'node-' + new Date().getTime();

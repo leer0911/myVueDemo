@@ -1,15 +1,6 @@
 <template>
-  <div class="flow-node"
-    :draggable="nodeInfo.draggable"
-    :style="nodePosition"
-    @dragstart="nodeDragStart(option.id)"
-    @drag="nodeDragging(option.id)"
-    @dragend="nodeDragEnd(option.id)"
-    @mouseenter="mouseEnterNode(option.id)">
-    <icon :name="option.type"
-      :size="80"
-      :ref="option.id"
-      style="cursor:move" />
+  <div class="flow-node" :draggable="nodeInfo.draggable" :style="nodePosition" @dragstart="nodeDragStart(option.id)" @drag="nodeDragging(option.id)" @dragend="nodeDragEnd(option.id)" @mouseenter="mouseEnterNode(option.id)">
+    <icon :name="option.type" :size="80" :ref="option.id" style="cursor:move" />
   </div>
 </template>
 
@@ -32,7 +23,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('flow', ['nodeData']),
+    ...mapState('flow', ['nodeData', 'lineData']),
     nodePosition() {
       return {
         left: `${this.option.left}px`,
@@ -41,7 +32,11 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('flow', ['UPDATE_NODE', 'UPDATE_HOVER_NODE']),
+    ...mapMutations('flow', [
+      'UPDATE_NODE',
+      'UPDATE_HOVER_NODE',
+      'UPDATE_LINE'
+    ]),
     nodeDragStart(id) {
       let img = this.$el;
       let dataTransfer = event.dataTransfer;
@@ -51,7 +46,44 @@ export default {
       this.$emit('nodeDragStart', id);
     },
     nodeDragging(id) {
-      this.$emit('nodeDragging', { id, event });
+      // this.$emit('nodeDragging', { id, event });
+      const x = event.clientX;
+      const y = event.clientY;
+      const { width, height } = this.nodeData[id];
+      const nodeOffsetX = x- 208;
+      const nodeOffsetY = y- 68 -height;
+      this.updateLine(Number(nodeOffsetX), Number(nodeOffsetY), id);
+    },
+    updateLine(nodeOffsetX, nodeOffsetY, id) {
+      let data = {};
+      for (var key in this.lineData) {
+        const {startId,endId} = this.lineData[key]
+
+        if (startId === id) {
+          data = {
+            ...data,
+            [key]: {
+              ...this.lineData[key],
+              startPosition: {
+                x: nodeOffsetX,
+                y: nodeOffsetY
+              }
+            }
+          };
+        } else if (endId === id) {
+          data = {
+            ...data,
+            [key]: {
+              ...this.lineData[key],
+              endPosition: {
+                x: nodeOffsetX,
+                y: nodeOffsetY
+              }
+            }
+          };
+        }
+      }
+      this.UPDATE_LINE(data);
     },
     nodeDragEnd(id) {
       this.$emit('nodeDragEnd', { id, event });

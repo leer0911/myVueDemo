@@ -14,13 +14,18 @@
           transform="scale(0.8)"></path>
       </marker>
     </defs>
-    <flow-line v-for="(item,index) in lineData"
+    <!-- <flow-line v-for="(item,index) in lineData"
       :key="index"
       :option="item"
       v-if="lineData"></flow-line>
     <flow-line :option="shadowLineData"
-      v-if="shadowLineData"></flow-line>
-    <flow-path></flow-path>
+      v-if="shadowLineData"></flow-line> -->
+    <flow-path v-for="(item,index) in lineData"
+      :key="index"
+      :lineOption="item"
+      v-if="lineData"></flow-path>
+    <flow-path :lineOption="shadowLineData"
+       v-if="shadowLineData"></flow-path>
   </svg>
 </template>
 

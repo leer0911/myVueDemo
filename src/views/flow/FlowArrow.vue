@@ -5,7 +5,7 @@
     <img src="~assets/arrow.png"
       draggable="false"
       class="arrow"
-      v-for="(item,index) in ['t','b','l','r']"
+      v-for="(item,index) in ['c']"
       :key="index"
       :class="`arrow-${item}`"
       @mouseover="arrowPointEnter(item)"
@@ -119,11 +119,13 @@ export default {
       this.lineInfo.lineDrawing = false;
     },
     getPointPosition(target) {
-      const { top, left } = getRelativePosition(target, this.$parent.$el);
-      const { width, height } = target.getBoundingClientRect();
+      const node = this.nodeData[this.nodeId]
+      const {top,left,width,height} = node
+      // const { top, left } = getRelativePosition(target, this.$parent.$el);
+      // const { width, height } = target.getBoundingClientRect();
       return {
-        x: left + width / 2,
-        y: top + height / 2
+        x: Number(left) + Number(width) / 2,
+        y:40+Number(top)
       };
     },
     drawLineEnd() {
@@ -151,6 +153,11 @@ export default {
     cursor: crosshair;
     position: absolute;
     z-index: 99999;
+    &-c {
+      top: 0;
+      left: 50%;
+      transform: translate(-50%,105%);
+    }
     &-t {
       top: 0;
       left: 50%;
